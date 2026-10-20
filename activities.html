@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>공부 ON 수업 앱</title>
+<style>
+:root{--navy:#243b70;--green:#dcebdc;--cream:#faf8f2;--line:#e7e0d2;--yellow:#fff0b8;--pink:#f8e1e2}
+*{box-sizing:border-box}
+body{margin:0;background:var(--cream);color:#26324a;font-family:Arial,"Noto Sans KR",sans-serif;line-height:1.6}
+main{max-width:850px;margin:0 auto;padding:28px 18px 48px}
+h1{font-size:clamp(1.8rem,5vw,2.5rem);color:var(--navy);margin:0 0 8px}
+.subtitle{margin:0 0 24px;color:#5b6476}
+nav{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0 22px}
+button{font:inherit;cursor:pointer;border:0;border-radius:12px;padding:11px 16px;background:var(--navy);color:white;font-weight:700}
+button.secondary{background:white;color:var(--navy);border:1px solid var(--line)}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid #e7b94c;outline-offset:2px}
+.panel{background:white;border:2px solid var(--line);border-radius:20px;padding:22px;margin:14px 0}
+.panel h2{margin:0 0 6px;color:var(--navy);font-size:1.45rem}
+.hint{color:#606a7c;margin-top:0}
+.hidden{display:none!important}
+label{display:block;font-weight:700;margin:16px 0 6px}
+input[type=text],textarea{width:100%;padding:12px;border:1px solid #cbd1da;border-radius:10px;font:inherit;background:#fff}
+textarea{min-height:82px;resize:vertical}
+.choices{display:flex;flex-wrap:wrap;gap:9px}
+.choice{background:#fff;color:#273653;border:2px solid var(--line);padding:10px 13px;border-radius:12px}
+.choice.selected{border-color:var(--navy);background:#edf1fb}
+.weather-emoji{font-size:1.3rem}
+.result{background:#edf5ed;border-radius:12px;padding:14px;margin-top:16px;white-space:pre-wrap}
+.progress{height:8px;background:#e9e9e9;border-radius:20px;overflow:hidden;margin:12px 0 18px}
+.progress span{display:block;height:100%;width:0;background:#8ebc91;transition:width .2s}
+footer{font-size:.9rem;color:#6b7280;text-align:center;margin-top:26px}
+@media(max-width:520px){main{padding:22px 13px 36px}.panel{padding:17px}nav button{flex:1}}
+</style>
+</head>
+<body>
+<main>
+  <h1>공부 ON 수업 앱</h1>
+  <p class="subtitle">나의 공부 상태를 살펴보고, 실천할 목표를 만들어 봐요.</p>
+  <nav aria-label="활동 선택">
+    <button id="weatherTab" type="button" aria-pressed="true">🌦️ 공부 날씨 체크인</button>
+    <button id="goalTab" type="button" class="secondary" aria-pressed="false">🎯 목표 레시피 챌린지</button>
+  </nav>
+
+  <section id="weatherPanel" class="panel">
+    <h2>🌦️ 공부 날씨 체크인</h2>
+    <p class="hint">지금 나의 마음과 공부 준비 상태를 날씨에 빗대어 살펴봐요.</p>
+    <div class="progress"><span id="weatherProgress"></span></div>
+    <label>1. 지금 내 마음의 날씨는 어떤가요?</label>
+    <div class="choices" id="weatherChoices">
+      <button type="button" class="choice" data-value="☀️ 맑음">☀️ 맑음</button>
+      <button type="button" class="choice" data-value="🌤️ 조금 맑음">🌤️ 조금 맑음</button>
+      <button type="button" class="choice" data-value="☁️ 흐림">☁️ 흐림</button>
+      <button type="button" class="choice" data-value="🌧️ 비">🌧️ 비</button>
+      <button type="button" class="choice" data-value="⛈️ 천둥번개">⛈️ 천둥번개</button>
+    </div>
+    <label>2. 지금 공부할 준비가 된 정도는?</label>
+    <div class="choices" id="readyChoices">
+      <button type="button" class="choice" data-value="1">1 · 아직 어려워요</button>
+      <button type="button" class="choice" data-value="2">2 · 조금 준비됐어요</button>
+      <button type="button" class="choice" data-value="3">3 · 해볼 수 있어요</button>
+      <button type="button" class="choice" data-value="4">4 · 꽤 준비됐어요</button>
+      <button type="button" class="choice" data-value="5">5 · 바로 시작할 수 있어요</button>
+    </div>
+    <label for="weatherNote">3. 그렇게 느끼는 이유 또는 나에게 필요한 것</label>
+    <textarea id="weatherNote" placeholder="예: 조금 피곤해요. 물을 마시고 시작하고 싶어요."></textarea>
+    <label for="weatherAction">4. 공부를 시작하기 전에 할 작은 행동</label>
+    <input id="weatherAction" type="text" placeholder="예: 책상 정리하기, 심호흡 세 번 하기">
+    <div style="margin-top:18px"><button type="button" id="saveWeather">체크인 저장하기</button></div>
+    <div id="weatherResult" class="result hidden" aria-live="polite"></div>
+  </section>
+
+  <section id="goalPanel" class="panel hidden">
+    <h2>🎯 목표 레시피 챌린지</h2>
+    <p class="hint">목표를 요리 레시피처럼 작고 구체적인 단계로 만들어 봐요.</p>
+    <div class="progress"><span id="goalProgress"></span></div>
+    <label for="goalName">1. 내가 이루고 싶은 목표</label>
+    <input id="goalName" type="text" placeholder="예: 수학 숙제에서 분수 문제 5개 풀기">
+    <label for="goalWhy">2. 이 목표를 이루고 싶은 이유</label>
+    <textarea id="goalWhy" placeholder="예: 수학 시간에 자신감을 갖고 싶어요."></textarea>
+    <label for="goalStep1">3. 첫 번째 작은 단계</label>
+    <input id="goalStep1" type="text" placeholder="예: 문제를 읽고 중요한 숫자에 표시하기">
+    <label for="goalStep2">4. 두 번째 작은 단계</label>
+    <input id="goalStep2" type="text" placeholder="예: 한 문제씩 풀고 답 확인하기">
+    <label for="goalWhen">5. 언제, 어디서 실천할까요?</label>
+    <input id="goalWhen" type="text" placeholder="예: 오늘 저녁 7시, 식탁에서">
+    <label for="goalObstacle">6. 방해가 생기면 어떻게 할까요?</label>
+    <textarea id="goalObstacle" placeholder="예: 집중이 안 되면 3분 쉬고 첫 번째 문제만 시작하기"></textarea>
+    <label for="goalSupport">7. 나에게 도움이 되는 재료(도움·도구·강점)</label>
+    <input id="goalSupport" type="text" placeholder="예: 타이머, 연필, 가족의 응원">
+    <div style="margin-top:18px"><button type="button" id="saveGoal">나의 목표 레시피 만들기</button></div>
+    <div id="goalResult" class="result hidden" aria-live="polite"></div>
+  </section>
+
+  <section class="panel">
+    <h2>내 활동 기록</h2>
+    <p class="hint">이 기기와 브라우저에 저장된 체크인·목표 기록을 확인할 수 있어요.</p>
+    <div id="history"><p>아직 저장된 기록이 없습니다.</p></div>
+    <button type="button" class="secondary" id="clearHistory">이 기기의 기록 지우기</button>
+  </section>
+  <footer>공부 ON 프로젝트 · 나를 알고, 공부하는 힘을 깨우기</footer>
+</main>
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  let selectedWeather = "";
+  let selectedReady = "";
+  const history = (() => { try { return JSON.parse(localStorage.getItem("studyOnHistory") || "[]"); } catch(e) { return []; } })();
+
+  function switchTab(which){
+    const weather = which === "weather";
+    $("weatherPanel").classList.toggle("hidden", !weather);
+    $("goalPanel").classList.toggle("hidden", weather);
+    $("weatherTab").classList.toggle("secondary", !weather);
+    $("goalTab").classList.toggle("secondary", weather);
+    $("weatherTab").setAttribute("aria-pressed", String(weather));
+    $("goalTab").setAttribute("aria-pressed", String(!weather));
+  }
+  $("weatherTab").addEventListener("click", () => switchTab("weather"));
+  $("goalTab").addEventListener("click", () => switchTab("goal"));
+
+  function bindChoices(containerId, onSelect){
+    const container = $(containerId);
+    container.querySelectorAll(".choice").forEach(btn => btn.addEventListener("click", () => {
+      container.querySelectorAll(".choice").forEach(b => b.classList.remove("selected"));
+      btn.classList.add("selected");
+      onSelect(btn.dataset.value);
+      updateProgress();
+    }));
+  }
+  bindChoices("weatherChoices", v => selectedWeather = v);
+  bindChoices("readyChoices", v => selectedReady = v);
+
+  function updateProgress(){
+    const weatherCount = (selectedWeather ? 1 : 0) + (selectedReady ? 1 : 0) +
+      ($("weatherNote").value.trim() ? 1 : 0) + ($("weatherAction").value.trim() ? 1 : 0);
+    $("weatherProgress").style.width = (weatherCount / 4 * 100) + "%";
+    const goalIds = ["goalName","goalWhy","goalStep1","goalStep2","goalWhen","goalObstacle","goalSupport"];
+    const count = goalIds.filter(id => $(id).value.trim()).length;
+    $("goalProgress").style.width = (count / goalIds.length * 100) + "%";
+  }
+  document.querySelectorAll("input,textarea").forEach(el => el.addEventListener("input", updateProgress));
+
+  function saveRecord(record){
+    history.unshift({...record, date:new Date().toLocaleString("ko-KR")});
+    try { localStorage.setItem("studyOnHistory", JSON.stringify(history)); } catch(e) {}
+    renderHistory();
+  }
+  $("saveWeather").addEventListener("click", () => {
+    if(!selectedWeather || !selectedReady){
+      $("weatherResult").textContent = "마음의 날씨와 공부 준비 정도를 먼저 선택해 주세요.";
+      $("weatherResult").classList.remove("hidden"); return;
+    }
+    const note = $("weatherNote").value.trim() || "이유를 적지 않았어요.";
+    const action = $("weatherAction").value.trim() || "작은 행동을 하나 정해 보세요.";
+    const text = `오늘의 마음 날씨: ${selectedWeather}\n공부 준비 정도: ${selectedReady}/5\n내 마음 살펴보기: ${note}\n시작 전 작은 행동: ${action}\n\n날씨가 어떻든 괜찮아요. 지금 나에게 맞는 속도로 시작해 봐요!`;
+    $("weatherResult").textContent = text;
+    $("weatherResult").classList.remove("hidden");
+    saveRecord({type:"공부 날씨 체크인", summary:`${selectedWeather} · 준비도 ${selectedReady}/5`, detail:text});
+  });
+  $("saveGoal").addEventListener("click", () => {
+    const goal = $("goalName").value.trim();
+    if(!goal){
+      $("goalResult").textContent = "먼저 이루고 싶은 목표를 적어 주세요.";
+      $("goalResult").classList.remove("hidden"); $("goalName").focus(); return;
+    }
+    const fields = [
+      ["목표", goal],["이유", $("goalWhy").value.trim() || "아직 적지 않았어요."],
+      ["첫 단계", $("goalStep1").value.trim() || "첫 단계를 정해 보세요."],
+      ["두 번째 단계", $("goalStep2").value.trim() || "두 번째 단계를 정해 보세요."],
+      ["실천 시간·장소", $("goalWhen").value.trim() || "시간과 장소를 정해 보세요."],
+      ["방해 대처법", $("goalObstacle").value.trim() || "어려움이 생겼을 때의 방법을 정해 보세요."],
+      ["도움이 되는 재료", $("goalSupport").value.trim() || "도움이 될 도구나 사람을 찾아보세요."]
+    ];
+    const text = "나의 목표 레시피\n" + fields.map(([k,v]) => `${k}: ${v}`).join("\n") + "\n\n완벽하게 하는 것보다 작은 단계부터 실천하는 것이 중요해요!";
+    $("goalResult").textContent = text;
+    $("goalResult").classList.remove("hidden");
+    saveRecord({type:"목표 레시피 챌린지", summary:goal, detail:text});
+  });
+  function renderHistory(){
+    const host = $("history");
+    if(!history.length){host.innerHTML="<p>아직 저장된 기록이 없습니다.</p>";return;}
+    host.replaceChildren();
+    history.forEach(item => {
+      const article = document.createElement("article");
+      article.style.cssText="border-top:1px solid #e7e0d2;padding:12px 0";
+      const title = document.createElement("strong"); title.textContent = item.type + " · " + item.date;
+      const summary = document.createElement("p"); summary.textContent = item.summary; summary.style.margin="4px 0";
+      const details = document.createElement("details");
+      const summaryEl = document.createElement("summary"); summaryEl.textContent="기록 자세히 보기";
+      const pre = document.createElement("p"); pre.textContent=item.detail; pre.style.whiteSpace="pre-wrap";
+      details.append(summaryEl,pre); article.append(title,summary,details); host.append(article);
+    });
+  }
+  $("clearHistory").addEventListener("click", () => {
+    if(!confirm("이 브라우저에 저장된 활동 기록을 모두 지울까요?")) return;
+    history.splice(0,history.length);
+    try { localStorage.removeItem("studyOnHistory"); } catch(e) {}
+    renderHistory();
+  });
+  renderHistory(); updateProgress();
+})();
+</script>
+</body>
+</html>
