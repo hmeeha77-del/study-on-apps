@@ -46,7 +46,7 @@ footer{font-size:.9rem;color:#6b7280;text-align:center;margin-top:26px}
     <h2>🌦️ 공부 날씨 체크인</h2>
     <p class="hint">지금 나의 마음과 공부 준비 상태를 날씨에 빗대어 살펴봐요.</p>
     <div class="progress"><span id="weatherProgress"></span></div>
-    <label>1. 지금 내 마음의 날씨는 어떤가요?</label>
+    <label>1. 공부할 때 내 마음의 날씨는 어떤가요?</label>
     <div class="choices" id="weatherChoices">
       <button type="button" class="choice" data-value="☀️ 맑음">☀️ 맑음</button>
       <button type="button" class="choice" data-value="🌤️ 조금 맑음">🌤️ 조금 맑음</button>
@@ -54,18 +54,35 @@ footer{font-size:.9rem;color:#6b7280;text-align:center;margin-top:26px}
       <button type="button" class="choice" data-value="🌧️ 비">🌧️ 비</button>
       <button type="button" class="choice" data-value="⛈️ 천둥번개">⛈️ 천둥번개</button>
     </div>
-    <label>2. 지금 공부할 준비가 된 정도는?</label>
-    <div class="choices" id="readyChoices">
-      <button type="button" class="choice" data-value="1">1 · 아직 어려워요</button>
-      <button type="button" class="choice" data-value="2">2 · 조금 준비됐어요</button>
-      <button type="button" class="choice" data-value="3">3 · 해볼 수 있어요</button>
-      <button type="button" class="choice" data-value="4">4 · 꽤 준비됐어요</button>
-      <button type="button" class="choice" data-value="5">5 · 바로 시작할 수 있어요</button>
+    <label>2. 공부할 때 어떤 점이 어렵나요?</label>
+    <div class="choices" id="difficultyChoices">
+      <button type="button" class="choice" data-value="집중하기">집중하기</button>
+      <button type="button" class="choice" data-value="내용 이해하기">내용 이해하기</button>
+      <button type="button" class="choice" data-value="외우기">외우기</button>
+      <button type="button" class="choice" data-value="공부 시작하기">공부 시작하기</button>
+      <button type="button" class="choice" data-value="계획대로 실천하기">계획대로 실천하기</button>
+      <button type="button" class="choice" data-value="특별히 어려운 점 없음">특별히 어려운 점 없음</button>
+      <button type="button" class="choice" data-value="기타">기타</button>
     </div>
-    <label for="weatherNote">3. 그렇게 느끼는 이유 또는 나에게 필요한 것</label>
-    <textarea id="weatherNote" placeholder="예: 조금 피곤해요. 물을 마시고 시작하고 싶어요."></textarea>
-    <label for="weatherAction">4. 공부를 시작하기 전에 할 작은 행동</label>
-    <input id="weatherAction" type="text" placeholder="예: 책상 정리하기, 심호흡 세 번 하기">
+    <label for="weatherNote">3. 공부가 어려울 때 나는 주로 어떻게 하나요?</label>
+    <div class="choices" id="copingChoices">
+      <button type="button" class="choice" data-value="계속 노력해요">계속 노력해요</button>
+      <button type="button" class="choice" data-value="잠깐 쉬어요">잠깐 쉬어요</button>
+      <button type="button" class="choice" data-value="다른 사람에게 물어봐요">도움을 요청해요</button>
+      <button type="button" class="choice" data-value="미루거나 포기해요">미루거나 포기해요</button>
+      <button type="button" class="choice" data-value="잘 모르겠어요">잘 모르겠어요</button>
+    </div>
+    <label>4. 공부할 때 나에게 어떤 도움이 필요할까요?</label>
+    <div class="choices" id="helpChoices">
+      <button type="button" class="choice" data-value="조용한 환경">조용한 환경</button>
+      <button type="button" class="choice" data-value="쉬운 설명">쉬운 설명</button>
+      <button type="button" class="choice" data-value="충분한 시간">충분한 시간</button>
+      <button type="button" class="choice" data-value="응원과 격려">응원과 격려</button>
+      <button type="button" class="choice" data-value="함께 공부하기">함께 공부하기</button>
+      <button type="button" class="choice" data-value="스스로 해보고 싶어요">스스로 해보고 싶어요</button>
+    </div>
+    <label for="weatherAction">5. 오늘 공부를 위해 내가 실천할 작은 행동은 무엇인가요?</label>
+    <input id="weatherAction" type="text" placeholder="예: 책상 정리하기, 모르는 문제 한 개 질문하기">
     <div style="margin-top:18px"><button type="button" id="saveWeather">체크인 저장하기</button></div>
     <div id="weatherResult" class="result hidden" aria-live="polite"></div>
   </section>
@@ -74,8 +91,8 @@ footer{font-size:.9rem;color:#6b7280;text-align:center;margin-top:26px}
     <h2>🎯 목표 레시피 챌린지</h2>
     <p class="hint">목표를 요리 레시피처럼 작고 구체적인 단계로 만들어 봐요.</p>
     <div class="progress"><span id="goalProgress"></span></div>
-    <label for="goalName">1. 내가 이루고 싶은 목표</label>
-    <input id="goalName" type="text" placeholder="예: 수학 숙제에서 분수 문제 5개 풀기">
+    <label for="goalName">1. 이번 학기에 이루고 싶은 목표는 무엇인가요?</label>
+    <input id="goalName" type="text" placeholder="예: 매일 15분 책 읽기, 수학 시간에 모르는 문제 질문하기">
     <label for="goalWhy">2. 이 목표를 이루고 싶은 이유</label>
     <textarea id="goalWhy" placeholder="예: 수학 시간에 자신감을 갖고 싶어요."></textarea>
     <label for="goalStep1">3. 첫 번째 작은 단계</label>
@@ -104,7 +121,9 @@ footer{font-size:.9rem;color:#6b7280;text-align:center;margin-top:26px}
 (() => {
   const $ = id => document.getElementById(id);
   let selectedWeather = "";
-  let selectedReady = "";
+  let selectedDifficulty = "";
+  let selectedCoping = "";
+  let selectedHelp = "";
   const history = (() => { try { return JSON.parse(localStorage.getItem("studyOnHistory") || "[]"); } catch(e) { return []; } })();
 
   function switchTab(which){
@@ -129,12 +148,13 @@ footer{font-size:.9rem;color:#6b7280;text-align:center;margin-top:26px}
     }));
   }
   bindChoices("weatherChoices", v => selectedWeather = v);
-  bindChoices("readyChoices", v => selectedReady = v);
+  bindChoices("difficultyChoices", v => selectedDifficulty = v);
+  bindChoices("copingChoices", v => selectedCoping = v);
+  bindChoices("helpChoices", v => selectedHelp = v);
 
   function updateProgress(){
-    const weatherCount = (selectedWeather ? 1 : 0) + (selectedReady ? 1 : 0) +
-      ($("weatherNote").value.trim() ? 1 : 0) + ($("weatherAction").value.trim() ? 1 : 0);
-    $("weatherProgress").style.width = (weatherCount / 4 * 100) + "%";
+    const weatherCount = [selectedWeather, selectedDifficulty, selectedCoping, selectedHelp, $("weatherAction").value.trim()].filter(Boolean).length;
+    $("weatherProgress").style.width = (weatherCount / 5 * 100) + "%";
     const goalIds = ["goalName","goalWhy","goalStep1","goalStep2","goalWhen","goalObstacle","goalSupport"];
     const count = goalIds.filter(id => $(id).value.trim()).length;
     $("goalProgress").style.width = (count / goalIds.length * 100) + "%";
@@ -147,16 +167,15 @@ footer{font-size:.9rem;color:#6b7280;text-align:center;margin-top:26px}
     renderHistory();
   }
   $("saveWeather").addEventListener("click", () => {
-    if(!selectedWeather || !selectedReady){
-      $("weatherResult").textContent = "마음의 날씨와 공부 준비 정도를 먼저 선택해 주세요.";
+    if(!selectedWeather || !selectedDifficulty || !selectedCoping || !selectedHelp || !$ ("weatherAction").value.trim()){
+      $("weatherResult").textContent = "1~5번 문항에 답한 뒤 저장해 주세요.";
       $("weatherResult").classList.remove("hidden"); return;
     }
-    const note = $("weatherNote").value.trim() || "이유를 적지 않았어요.";
-    const action = $("weatherAction").value.trim() || "작은 행동을 하나 정해 보세요.";
-    const text = `오늘의 마음 날씨: ${selectedWeather}\n공부 준비 정도: ${selectedReady}/5\n내 마음 살펴보기: ${note}\n시작 전 작은 행동: ${action}\n\n날씨가 어떻든 괜찮아요. 지금 나에게 맞는 속도로 시작해 봐요!`;
+    const action = $("weatherAction").value.trim();
+    const text = `1. 공부할 때 내 마음의 날씨: ${selectedWeather}\n2. 공부할 때 어려운 점: ${selectedDifficulty}\n3. 어려울 때 대처 방법: ${selectedCoping}\n4. 필요한 도움: ${selectedHelp}\n5. 오늘 실천할 작은 행동: ${action}\n\n날씨가 어떻든 괜찮아요. 나에게 맞는 속도로 한 걸음 시작해 봐요!`;
     $("weatherResult").textContent = text;
     $("weatherResult").classList.remove("hidden");
-    saveRecord({type:"공부 날씨 체크인", summary:`${selectedWeather} · 준비도 ${selectedReady}/5`, detail:text});
+    saveRecord({type:"공부 날씨 체크인", summary:`${selectedWeather} · 어려움: ${selectedDifficulty}`, detail:text});
   });
   $("saveGoal").addEventListener("click", () => {
     const goal = $("goalName").value.trim();
