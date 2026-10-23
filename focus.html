@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>집중력 탐험 미션</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap">
+<style>
+:root{--bg:#FAF8F3;--card:#FFFFFF;--ink:#2B3A67;--sub:#5C6786;--line:#E3E0D6;--blue:#2F63D9;--blueInk:#FFFFFF;--sel:#E4ECFF;--yel:#FFC83D;--bar:#E8E4D8;--ok:#E0F3EA;--okInk:#17614A;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141A2E;--card:#222A47;--ink:#F2EFE6;--sub:#B8BFD6;--line:#39426A;--blue:#8FB0FF;--blueInk:#14203F;--sel:#2C3862;--bar:#39426A;--ok:#1E3A33;--okInk:#9CE3C6}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Noto Sans KR',system-ui,sans-serif;line-height:1.55;min-height:100vh}
+main{max-width:920px;margin:0 auto;padding:24px 20px 48px}
+h1{font-size:clamp(34px,6vw,54px);font-weight:800;line-height:1.15;margin:0 0 12px}
+h2{font-size:clamp(26px,4vw,34px);font-weight:800;line-height:1.35;margin:0 0 6px}
+p{margin:0}.lead{font-size:clamp(19px,2.7vw,23px);color:var(--sub)}
+.top{display:flex;align-items:center;gap:14px;margin-bottom:20px}
+.count{font-weight:800;font-size:20px;white-space:nowrap}
+.bar{flex:1;height:12px;border-radius:99px;background:var(--bar);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--blue);border-radius:99px;transition:width .4s}
+.card{background:var(--card);border:1px solid var(--line);border-radius:24px;padding:clamp(18px,4vw,32px)}
+.types{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin:18px 0}
+.t{font:inherit;color:var(--ink);background:var(--card);border:3px solid var(--line);border-radius:18px;padding:14px;text-align:left;cursor:pointer;font-size:20px;font-weight:700}
+.t small{display:block;font-weight:400;font-size:17px;color:var(--sub)}
+.t.has{background:var(--sel)}.cnt{color:var(--blue);font-weight:800!important}
+.t[aria-pressed="true"]{border-color:var(--blue);background:var(--sel)}
+.list{display:grid;gap:10px;padding:0;margin:14px 0 0;list-style:none}
+.it{width:100%;display:flex;gap:12px;align-items:center;text-align:left;font:inherit;font-size:clamp(19px,2.5vw,22px);color:var(--ink);background:var(--card);border:3px solid var(--line);border-radius:16px;padding:13px 16px;min-height:58px;cursor:pointer}
+.it[aria-pressed="true"]{border-color:var(--blue);background:var(--sel)}
+.box{flex:none;width:28px;height:28px;border-radius:8px;border:3px solid var(--sub);display:grid;place-items:center;font-weight:800;font-size:17px;color:var(--blueInk)}
+.it[aria-pressed="true"] .box{background:var(--blue);border-color:var(--blue)}
+.h3{font-size:22px;font-weight:800;margin:22px 0 4px}
+.chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}
+.chip{font:inherit;font-size:20px;font-weight:700;color:var(--ink);background:var(--card);border:3px solid var(--line);border-radius:99px;padding:10px 20px;cursor:pointer;min-height:50px}
+.chip[aria-pressed="true"]{border-color:var(--blue);background:var(--sel)}
+.btn{font:inherit;font-weight:800;font-size:22px;border:0;border-radius:16px;padding:14px 30px;min-height:56px;cursor:pointer;background:var(--blue);color:var(--blueInk)}
+.btn.ghost{background:transparent;color:var(--ink);border:3px solid var(--line)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+:focus-visible{outline:4px solid var(--yel);outline-offset:3px}
+.row{display:flex;gap:12px;margin-top:24px;flex-wrap:wrap}
+.note{background:var(--sel);border-radius:16px;padding:14px 18px;font-size:19px;margin-top:16px}
+.sum{display:grid;gap:12px;margin-top:18px}
+.box2{background:var(--bg);border-radius:16px;padding:14px 18px;font-size:20px}
+.box2 b{display:block;color:var(--sub);font-size:17px;font-weight:700}
+.fb{background:var(--ok);color:var(--okInk);border-radius:16px;padding:14px 18px;font-size:20px;margin-top:10px}
+input[type=text]{width:100%;font:inherit;font-size:21px;color:var(--ink);background:var(--card);border:3px solid var(--line);border-radius:16px;padding:14px 16px;margin-top:8px}
+.promise{border:3px dashed var(--blue);border-radius:18px;padding:16px 20px;margin-top:18px}
+.wi{margin-top:18px}.wi label{font-size:18px;font-weight:700;color:var(--sub)}.wr{display:flex;gap:10px}.wr .btn{font-size:20px;padding:10px 22px;min-height:54px;margin-top:8px;white-space:nowrap}
+.promise b{font-size:19px;color:var(--sub)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<main id="app"></main>
+<script>
+var T=[
+{k:'env',n:'주변',d:'소리, 물건, 사람',s:[
+ {k:'e1',t:'TV나 영상 소리가 들려요'},{k:'e2',t:'책상 위에 물건이 많아요'},{k:'e3',t:'가족이나 친구가 말을 걸어요'},{k:'e4',t:'형제나 반려동물이 옆에서 놀아요'},{k:'e5',t:'방이 덥거나 춥거나 어두워요'}],
+ f:'주변을 정리하면 마음도 가벼워져요. 방해 소리와 물건을 줄이는 것이 첫걸음이에요.',
+ g:['소리 나는 기기 끄기','책상 위에 필요한 것만 두기','조용한 장소로 옮기기','가족에게 공부 시간 알려 주기','창문을 닫고 조명 밝게 하기','앉는 자리 바꾸기']},
+{k:'dev',n:'기기',d:'스마트폰, 게임, 영상',s:[
+ {k:'d1',t:'스마트폰 알림이 울려요'},{k:'d2',t:'게임이나 영상이 자꾸 생각나요'},{k:'d3',t:'공부 중에 폰을 자꾸 확인해요'},{k:'d4',t:'단체 채팅방이 신경 쓰여요'},{k:'d5',t:'공부용 태블릿으로 다른 걸 해요'}],
+ f:'스마트폰을 멀리 두는 것은 집중을 지키는 가장 쉬운 방법이에요.',
+ g:['스마트폰을 다른 방에 두기','알림 끄기 또는 방해 금지 켜기','공부가 끝나면 보기로 약속하기','타이머를 켜 두고 공부하기','공부용 기기는 공부 화면만 켜 두기','부모님께 스마트폰 맡기기']},
+{k:'body',n:'몸과 마음',d:'피곤함, 배고픔, 걱정',s:[
+ {k:'b1',t:'졸리거나 피곤해요'},{k:'b2',t:'배가 고파요'},{k:'b3',t:'걱정되거나 다른 생각이 나요'},{k:'b4',t:'눈이나 머리가 아파요'},{k:'b5',t:'친구와 있었던 일이 생각나요'}],
+ f:'몸과 마음이 편안해야 집중이 쉬워요. 잠깐 쉬어 가는 것도 좋은 방법이에요.',
+ g:['물을 마시고 시작하기','5분 스트레칭하기','걱정을 종이에 적어 두기','공부 전에 가볍게 먹기','세수하거나 바람 쐬기','천천히 숨 5번 쉬기']},
+{k:'hab',n:'습관',d:'미루기, 쉬는 시간',s:[
+ {k:'h1',t:'시작을 자꾸 미루게 돼요'},{k:'h2',t:'자주 일어나서 돌아다녀요'},{k:'h3',t:'쉬는 시간이 길어져요'},{k:'h4',t:'어디서부터 해야 할지 몰라요'},{k:'h5',t:'어려운 문제가 나오면 그만두고 싶어요'}],
+ f:'시작 시간을 정해 두면 미루는 마음을 이길 수 있어요.',
+ g:['공부 시작 시각 정하기','25분 공부하고 5분 쉬기','오늘 할 공부 2가지 적기','쉬는 시간 타이머 맞추기','가장 쉬운 것부터 시작하기','다 하면 좋아하는 것으로 보상하기']}
+];
+var TIME=['아침','수업 시간','학교가 끝난 뒤','저녁','밤','주말','__c'],PLACE=['내 방','거실','교실','학원이나 도서관','학교 도서관','이동하는 차나 버스','__c'];
+var ST=['intro','m1','m2','m3','result'];
+var app=document.getElementById('app'),S;
+function reset(){S={i:0,open:'env',sel:[],strongs:[],when:null,where:null,g:[],promise:'',custom:[],cgl:[],wc:'',wg:'',wt:'',pt:''}}
+function allS(){var a=[];T.forEach(function(t){t.s.forEach(function(s){a.push({k:s.k,t:s.t,ty:t.k})})});return a}
+function sit(k){return allS().concat(S.custom).filter(function(s){return s.k===k})[0]}
+function ty(k){return T.filter(function(t){return t.k===k})[0]}
+function types(){var r=[];S.sel.forEach(function(k){var y=sit(k).ty;if(r.indexOf(y)<0)r.push(y)});return r}
+function strongTypes(){var r=[];S.strongs.forEach(function(k){var y=sit(k).ty;if(r.indexOf(y)<0)r.push(y)});return r}
+function tog(arr,v,max){var i=arr.indexOf(v);if(i>=0)arr.splice(i,1);else if(!max||arr.length<max)arr.push(v)}
+function lb(x){return x==='__c'?'기타 (직접 쓰기)':x}
+function esc(x){return String(x).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;')}
+function wi(id,label,val,max,btn){return '<div class="wi"><label for="'+id+'">'+label+'</label><div class="wr"><input type="text" id="'+id+'" maxlength="'+max+'" value="'+esc(val)+'" placeholder="이름이나 학교는 쓰지 않아요">'+(btn?'<button class="btn" id="'+id+'b">추가</button>':'')+'</div></div>'}
+function go(d){S.i+=d;if(ST[S.i]==='result'&&!S.promise)defaultPromise();render();window.scrollTo(0,0)}
+function defaultPromise(){S.promise='나는 '+(S.strongs.length?S.strongs.map(function(k){return '‘'+sit(k).t+'’'}).join(', ')+' 때문에 집중이 어려워요. ':'집중이 어려울 때가 있어요. ')+(S.g.length?'그럴 때 '+S.g.slice(0,2).map(function(g){return '‘'+g+'’'}).join(', ')+' 방법을 쓸게요.':'')}
+function render(){
+ var st=ST[S.i],h='',n=ST.length-1;
+ if(st==='intro'){
+  h='<h1>집중력 탐험 미션</h1><p class="lead">누구나 집중을 방해하는 방해범이 있어요. 방해범을 찾으면 이길 수 있어요. 미션 3개를 해결하고 나만의 집중 세팅을 만들어요.</p><div class="note">정답은 없어요. 나에게 맞는 것을 골라요.</div><div class="row"><button class="btn" id="go">미션 시작</button></div>';
+ }else{
+  var lab=st==='m1'?'미션 1':st==='m2'?'미션 2':st==='m3'?'미션 3':'결과';
+  h='<div class="top"><span class="count">'+lab+'</span><div class="bar"><i style="width:'+Math.round(S.i/n*100)+'%"></i></div></div><div class="card">';
+  if(st==='m1'){
+   h+='<h2>집중을 방해하는 상황 탐색</h2><p class="lead">유형 버튼을 눌러 상황을 보고, 나도 이런 적 있으면 눌러요. 다른 유형도 눌러서 여러 유형을 골라도 좋아요. (상황 최대 5개)</p><div class="types">'
+   +T.map(function(t){var c=S.sel.filter(function(k){return sit(k).ty===t.k}).length;return '<button class="t'+(c?' has':'')+'" data-t="'+t.k+'" aria-pressed="'+(S.open===t.k)+'">'+t.n+'<small>'+t.d+'</small>'+(c?'<small class="cnt">✓ '+c+'개 골랐어요</small>':'')+'</button>'}).join('')+'</div>';
+   var t=ty(S.open);
+   h+='<ul class="list">'+t.s.concat(S.custom.filter(function(c){return c.ty===t.k})).map(function(s){var on=S.sel.indexOf(s.k)>=0;return '<li><button class="it" data-s="'+s.k+'" aria-pressed="'+on+'"><span class="box">'+(on?'✓':'')+'</span>'+s.t+'</button></li>'}).join('')+'</ul>'
+   +wi('wc','맞는 게 없나요? 직접 쓰기 ('+t.n+' 방해범으로 들어가요)',S.wc,20,true)+'<div class="note">고른 상황 '+S.sel.length+'/5개'+(S.sel.length>=5?' · 더 고르려면 하나를 눌러 빼요':'')+'</div>';
+  }else if(st==='m2'){
+   h+='<h2>나의 가장 센 방해범은?</h2>';
+   if(!S.sel.length){h+='<p class="lead">아직 고른 상황이 없어요. 미션 1로 돌아가서 하나 이상 골라요.</p>';}
+   else{
+    h+='<p class="lead">내가 고른 방해범 중에서 가장 센 것을 1~2개 골라요. (최대 2개)</p><ul class="list">'
+    +S.sel.map(function(k){var on=S.strongs.indexOf(k)>=0;return '<li><button class="it" data-st="'+k+'" aria-pressed="'+on+'"><span class="box">'+(on?'✓':'')+'</span>'+sit(k).t+'</button></li>'}).join('')+'</ul>'
+    +'<div class="h3">언제 나타나나요?</div><div class="chips">'+TIME.map(function(x){return '<button class="chip" data-w="'+x+'" aria-pressed="'+(S.when===x)+'">'+lb(x)+'</button>'}).join('')+'</div>'
+    +(S.when==='__c'?wi('wt','나타나는 때를 직접 써요 (20자)',S.wt,20,false):'')+'<div class="h3">어디에서 나타나나요?</div><div class="chips">'+PLACE.map(function(x){return '<button class="chip" data-p="'+x+'" aria-pressed="'+(S.where===x)+'">'+lb(x)+'</button>'}).join('')+'</div>'+(S.where==='__c'?wi('pt','나타나는 곳을 직접 써요 (20자)',S.pt,20,false):'');
+   }
+  }else if(st==='m3'){
+   var ts=types(),sg=strongTypes();ts=sg.concat(ts.filter(function(x){return sg.indexOf(x)<0}));
+   h+='<h2>나만의 집중 세팅</h2><p class="lead">내 방해범에 맞는 방법을 골라요. (1~4개)</p>';
+   ts.forEach(function(k){var t=ty(k);h+='<div class="h3">'+t.n+(sg.indexOf(k)>=0?' · 가장 센 방해범':'')+'</div><ul class="list">'+t.g.map(function(g){var on=S.g.indexOf(g)>=0;return '<li><button class="it" data-g="'+g+'" aria-pressed="'+on+'"><span class="box">'+(on?'✓':'')+'</span>'+g+'</button></li>'}).join('')+'</ul>'});
+   if(S.cgl.length){h+='<div class="h3">내가 쓴 방법</div><ul class="list">'+S.cgl.map(function(g){var on=S.g.indexOf(g)>=0;return '<li><button class="it" data-g="'+esc(g)+'" aria-pressed="'+on+'"><span class="box">'+(on?'✓':'')+'</span>'+esc(g)+'</button></li>'}).join('')+'</ul>'}
+   h+=wi('wg','맞는 방법이 없나요? 직접 쓰기 (30자)',S.wg,30,true)+'<div class="note">고른 방법 '+S.g.length+'/4개</div>';
+  }else{
+   var fbs=strongTypes().map(function(k){return ty(k).f});
+   h+='<h2>나의 집중 세팅 완성!</h2><div class="sum">'
+   +'<div class="box2"><b>나의 가장 센 방해범</b>'+(S.strongs.length?S.strongs.map(function(k){return '· '+esc(sit(k).t)}).join('<br>'):'고르지 않았어요')+'</div>'
+   +'<div class="box2"><b>나타나는 때와 곳</b>'+((S.when==='__c'?S.wt:S.when)||'시간 미선택')+' · '+((S.where==='__c'?S.pt:S.where)||'장소 미선택')+'</div>'
+   +'<div class="box2"><b>내가 고른 집중 세팅</b>'+(S.g.length?S.g.map(function(g){return '· '+esc(g)}).join('<br>'):'고르지 않았어요')+'</div></div>'
+   +fbs.map(function(f){return '<div class="fb">'+f+'</div>'}).join('')
+   +'<div class="promise"><b>나의 실천 약속 (고쳐 써도 돼요)</b><input type="text" id="pr" maxlength="140" value="'+S.promise.replace(/"/g,'&quot;')+'" aria-label="나의 실천 약속"></div>'
+   +'<div class="note">이 화면을 닫지 말고 루틴 카드에 옮겨 적어요. 캡처해도 좋아요.</div>';
+  }
+  h+='<div class="row">'+(S.i>0?'<button class="btn ghost" id="prev">이전</button>':'')
+  +(st==='result'?'<button class="btn ghost" id="again">다시 하기</button>':'<button class="btn" id="next"'+((st==='m1'&&!S.sel.length)||(st==='m2'&&!S.strongs.length)||(st==='m3'&&!S.g.length)?' disabled':'')+'>다음</button>')+'</div></div>';
+ }
+ app.innerHTML=h;
+ var q=function(i){return document.getElementById(i)};
+ if(q('go'))q('go').onclick=function(){go(1)};if(q('next'))q('next').onclick=function(){go(1)};
+ if(q('prev'))q('prev').onclick=function(){go(-1)};
+ if(q('again'))q('again').onclick=function(){reset();render()};
+ if(q('pr'))q('pr').oninput=function(e){S.promise=e.target.value};
+ each('.t',function(b){b.onclick=function(){S.open=b.getAttribute('data-t');render()}});
+ each('.it[data-s]',function(b){b.onclick=function(){var k=b.getAttribute('data-s');tog(S.sel,k,5);S.strongs=S.strongs.filter(function(x){return S.sel.indexOf(x)>=0});render()}});
+ each('.it[data-st]',function(b){b.onclick=function(){tog(S.strongs,b.getAttribute('data-st'),2);render()}});
+ each('.chip[data-w]',function(b){b.onclick=function(){S.when=b.getAttribute('data-w');render()}});
+ each('.chip[data-p]',function(b){b.onclick=function(){S.where=b.getAttribute('data-p');render()}});
+ ['wc','wg','wt','pt'].forEach(function(id){if(q(id))q(id).oninput=function(e){S[id]=e.target.value}});
+ if(q('wcb'))q('wcb').onclick=function(){var x=S.wc.trim();if(!x)return;var k='c'+(S.custom.length+1);S.custom.push({k:k,t:x,ty:S.open});if(S.sel.length<5)S.sel.push(k);S.wc='';render()};
+ if(q('wgb'))q('wgb').onclick=function(){var x=S.wg.trim();if(!x)return;if(S.cgl.indexOf(x)<0)S.cgl.push(x);if(S.g.indexOf(x)<0&&S.g.length<4)S.g.push(x);S.wg='';render()};
+ each('.it[data-g]',function(b){b.onclick=function(){tog(S.g,b.getAttribute('data-g'),4);render()}});
+}
+function each(s,f){Array.prototype.forEach.call(app.querySelectorAll(s),f)}
+reset();render();
+</script>
+</body>
+</html>

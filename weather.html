@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>공부 날씨 체크인</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap">
+<style>
+:root{--bg:#FAF8F3;--card:#FFFFFF;--ink:#2B3A67;--sub:#5C6786;--line:#E6E0D2;--navy:#2B3A67;--yel:#FFC83D;--cor:#FF7A59;--sel:#FFF3CF;--bar:#EAE4D6;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#151A2E;--card:#222A47;--ink:#F3EFE6;--sub:#B7BED6;--line:#39426A;--navy:#FFC83D;--sel:#3A3A2A;--bar:#39426A}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Noto Sans KR',system-ui,sans-serif;line-height:1.55;min-height:100vh}
+main{max-width:900px;margin:0 auto;padding:26px 20px 48px}
+h1{font-size:clamp(36px,6vw,56px);font-weight:800;line-height:1.15;margin:0 0 12px}
+h2{font-size:clamp(26px,4vw,34px);font-weight:800;line-height:1.35;margin:0 0 8px}
+p{margin:0}
+.lead{font-size:clamp(20px,2.8vw,24px);color:var(--sub)}
+.top{display:flex;align-items:center;gap:16px;margin-bottom:22px}
+.count{font-weight:700;font-size:20px;white-space:nowrap}
+.bar{flex:1;height:12px;border-radius:99px;background:var(--bar);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--cor);border-radius:99px;transition:width .4s}
+.card{background:var(--card);border:1px solid var(--line);border-radius:24px;padding:clamp(20px,4vw,34px)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-top:20px}
+.w{font:inherit;color:var(--ink);background:var(--card);border:3px solid var(--line);border-radius:20px;padding:16px 10px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;font-size:22px;font-weight:700;min-height:150px;transition:border-color .15s,background .15s,transform .15s}
+.w:hover{border-color:var(--yel)}
+.w[aria-pressed="true"]{border-color:var(--cor);background:var(--sel);transform:scale(1.03)}
+.opts{display:grid;gap:12px;padding:0;margin:20px 0 0;list-style:none}
+.opt{width:100%;display:flex;gap:14px;align-items:center;text-align:left;font:inherit;font-size:clamp(20px,2.6vw,22px);color:var(--ink);background:var(--card);border:3px solid var(--line);border-radius:16px;padding:14px 18px;cursor:pointer;min-height:58px}
+.opt[aria-pressed="true"]{border-color:var(--cor);background:var(--sel)}
+.box{flex:none;width:28px;height:28px;border-radius:8px;border:3px solid var(--sub);display:grid;place-items:center;font-weight:800;font-size:18px;color:#fff}
+.opt[aria-pressed="true"] .box{background:var(--cor);border-color:var(--cor)}
+input[type=text]{width:100%;font:inherit;font-size:20px;color:var(--ink);background:var(--card);border:3px solid var(--line);border-radius:16px;padding:14px 16px;margin-top:14px}
+.btn{font:inherit;font-weight:700;font-size:22px;border:0;border-radius:16px;padding:14px 30px;min-height:56px;cursor:pointer;background:var(--navy);color:var(--bg)}
+.btn.go{background:var(--cor);color:#2B3A67}
+.btn.ghost{background:transparent;color:var(--ink);border:3px solid var(--line)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+:focus-visible{outline:4px solid var(--yel);outline-offset:3px}
+.row{display:flex;gap:12px;margin-top:26px;flex-wrap:wrap}
+.modes{display:flex;gap:10px;margin:0 0 26px;flex-wrap:wrap}
+.mode{font:inherit;font-size:20px;font-weight:700;color:var(--ink);background:var(--card);border:3px solid var(--line);border-radius:99px;padding:10px 22px;cursor:pointer}
+.mode[aria-pressed="true"]{background:var(--navy);color:var(--bg);border-color:var(--navy)}
+.msg{background:var(--sel);border-radius:18px;padding:18px 22px;font-size:clamp(20px,2.8vw,24px);font-weight:500;margin-top:18px}
+.say{border:3px dashed var(--cor);border-radius:18px;padding:18px 22px;margin-top:18px;font-size:clamp(20px,2.8vw,24px);font-weight:700}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:18px}
+.two .card{text-align:center;padding:18px 10px;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:22px;font-weight:700}
+.two small{font-size:18px;color:var(--sub);font-weight:500}
+.hero{display:flex;gap:14px;margin:24px 0 28px;flex-wrap:wrap}
+@media (max-width:520px){.two{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<main id="app"></main>
+<script>
+var W=[
+{k:'sunny',n:'맑음',m:'맑은 날이에요. 이 기분을 기억해 두면 힘이 돼요.',r:['문제를 풀어서 뿌듯한 일','새로운 걸 알게 된 일','공부가 재미있는 시간','칭찬을 받은 일']},
+{k:'cloudy',n:'구름',m:'구름이 낀 날도 있어요. 그럴 수 있어요.',r:['잘 모르는 게 있는 일','할 일이 많은 일','할까 말까 고민되는 일','그냥 보통인 날']},
+{k:'rain',n:'비',m:'비 오는 날도 있어요. 이런 마음을 알아보는 게 첫걸음이에요.',r:['공부가 힘들고 지치는 일','계속 틀려서 속상한 일','혼자 해야 해서 외로운 일','하기 싫은 마음']},
+{k:'storm',n:'번개',m:'마음이 번쩍할 때도 있어요. 그 마음을 말해 주어서 고마워요.',r:['시험이나 발표가 걱정되는 일','시간이 부족해서 급한 일','답답하고 화가 나는 일','잘하고 싶은데 안 되는 일']},
+{k:'rainbow',n:'무지개',m:'무지개가 떴네요! 좋은 마음을 오늘 공부에도 가져가 봐요.',r:['어려운 일을 해낸 일','나아진 내 모습을 발견한 일','친구와 함께 해서 즐거운 일','하고 싶은 게 생긴 일']}
+];
+var col={sunny:'#FFC83D',cloudy:'#9FB3D9',rain:'#6FA3E8',storm:'#7A6FD6',rainbow:'#FF7A59'};
+function icon(k,s){
+ var c='<path d="M20 44h30a10 10 0 0 0 0-20 14 14 0 0 0-27-3 11 11 0 0 0-3 23z" fill="#C9D6EE"/>',x='';
+ if(k==='sunny'){x='<circle cx="32" cy="32" r="12" fill="#FFC83D"/><g stroke="#FFC83D" stroke-width="4" stroke-linecap="round"><path d="M32 8v6M32 50v6M8 32h6M50 32h6M15 15l4 4M45 45l4 4M49 15l-4 4M19 45l-4 4"/></g>'}
+ else if(k==='cloudy')x='<path d="M16 46h34a11 11 0 0 0 0-22 15 15 0 0 0-29-3 12 12 0 0 0-5 25z" fill="#B8C7E6"/>';
+ else if(k==='rain')x=c.replace('M20 44','M20 38')+'<g stroke="#4F8BE0" stroke-width="4" stroke-linecap="round"><path d="M22 48l-3 8M34 48l-3 8M46 48l-3 8"/></g>';
+ else if(k==='storm')x=c.replace('M20 44','M20 38').replace('#C9D6EE','#9A95D8')+'<path d="M35 38l-9 12h7l-3 9 11-14h-7z" fill="#FFC83D"/>';
+ else x='<g fill="none" stroke-width="5" stroke-linecap="round"><path d="M8 50a24 24 0 0 1 48 0" stroke="#FF7A59"/><path d="M15 50a17 17 0 0 1 34 0" stroke="#FFC83D"/><path d="M22 50a10 10 0 0 1 20 0" stroke="#6FA3E8"/></g>';
+ return '<svg width="'+s+'" height="'+s+'" viewBox="0 0 64 64" aria-hidden="true">'+x+'</svg>';
+}
+function find(k){return W.filter(function(w){return w.k===k})[0]}
+var app=document.getElementById('app'),S;
+function reset(keepMode){S={mode:keepMode||1,step:-1,past:null,w:null,rs:[],txt:''}}
+function steps(){return S.mode===1?['weather','reason','result']:['past','weather','reason','result']}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function go(d){S.step+=d;if(S.step<0)S.step=-1;render()}
+function render(){
+ var h='',st=steps()[S.step],n=steps().length;
+ if(S.step<0){
+  h='<h1>공부 날씨 체크인</h1><p class="lead">공부 하면 내 마음은 어떤 날씨인가요?<br>어떤 날씨든 괜찮아요.</p><div class="hero" aria-hidden="true">'+W.map(function(w){return icon(w.k,64)}).join('')+'</div>'
+  +'<div class="modes" role="group" aria-label="모드 선택"><button class="mode" data-m="1" aria-pressed="'+(S.mode===1)+'">1회기 시작</button><button class="mode" data-m="3" aria-pressed="'+(S.mode===3)+'">3회기 마무리</button></div>'
+  +'<button class="btn go" id="start">시작</button>';
+ }else{
+  h='<div class="top"><span class="count">'+(S.step+1)+'/'+n+'단계</span><div class="bar"><i style="width:'+Math.round((S.step+1)/n*100)+'%"></i></div></div><div class="card">';
+  if(st==='past'||st==='weather'){
+   var key=st==='past'?S.past:S.w;
+   h+='<h2>'+(st==='past'?'1회기 때 나의 공부 날씨는?':(S.mode===3?'지금 나의 공부 날씨는?':'공부 하면 내 마음은 어떤 날씨인가요?'))+'</h2><p class="lead">'+(st==='past'?'기억나는 날씨를 하나 골라요.':'지금 마음에 가장 가까운 날씨를 하나 골라요.')+'</p><div class="grid">'
+   +W.map(function(w){return '<button class="w" data-w="'+w.k+'" aria-pressed="'+(key===w.k)+'">'+icon(w.k,72)+w.n+'</button>'}).join('')+'</div>';
+  }else if(st==='reason'){
+   var w=find(S.w);
+   h+='<h2>'+w.n+' 날씨인 이유는 무엇인가요?</h2><p class="lead">해당하는 것을 모두 골라요. 건너뛰어도 괜찮아요.</p><ul class="opts">'
+   +w.r.concat(['잘 모르겠어요']).map(function(r,i){var on=S.rs.indexOf(r)>=0;return '<li><button class="opt" data-r="'+i+'" aria-pressed="'+on+'"><span class="box">'+(on?'✓':'')+'</span>'+r+'</button></li>'}).join('')
+   +'</ul><input type="text" id="txt" maxlength="30" placeholder="직접 쓰기 (30자 이내)" value="'+esc(S.txt)+'" aria-label="직접 쓰기">';
+  }else{
+   var w=find(S.w),why=S.rs.filter(function(r){return r!=='잘 모르겠어요'});if(S.txt.trim())why.push(S.txt.trim());
+   h+='<h2>'+(S.mode===3?'오늘의 공부 날씨 확인':'나의 공부 날씨')+'</h2><div style="display:flex;align-items:center;gap:14px;margin-top:8px">'+icon(w.k,84)+'<p style="font-size:30px;font-weight:800">'+w.n+'</p></div><div class="msg">'+w.m+'</div>';
+   if(S.mode===3&&S.past){var p=find(S.past);h+='<div class="two"><div class="card">1회기<span>'+icon(p.k,72)+'</span>'+p.n+'</div><div class="card">지금<span>'+icon(w.k,72)+'</span>'+w.n+'</div></div><div class="msg">'+(S.past===S.w?'1회기와 같은 날씨예요. 같아도 괜찮아요. ':'1회기와 다른 날씨예요. ')+'날씨는 바뀔 수도, 그대로일 수도 있어요.</div>'}
+   h+='<div class="say">모둠에서 이렇게 말해 봐요.<br>“나는 '+w.n+' 날씨예요. 왜냐하면 '+(why.length?esc(why.join(', '))+' 때문이에요.':'___ 때문이에요.')+'”</div>';
+  }
+  h+='<div class="row"><button class="btn ghost" id="prev">이전</button>';
+  h+=st==='result'?'<button class="btn" id="again">다시 하기</button>':'<button class="btn go" id="next"'+(((st==='past'&&!S.past)||(st==='weather'&&!S.w))?' disabled':'')+'>다음</button>';
+  h+='</div></div>';
+ }
+ app.innerHTML=h;
+ var q=function(id){return document.getElementById(id)};
+ if(q('start'))q('start').onclick=function(){go(1)};
+ if(q('next'))q('next').onclick=function(){go(1)};
+ if(q('prev'))q('prev').onclick=function(){go(-1)};
+ if(q('again'))q('again').onclick=function(){reset(S.mode);render()};
+ each('.mode',function(b){b.onclick=function(){S.mode=+b.getAttribute('data-m');render()}});
+ each('.w',function(b){b.onclick=function(){var k=b.getAttribute('data-w');if(st==='past')S.past=k;else{if(S.w!==k){S.rs=[];S.txt=''}S.w=k}render()}});
+ each('.opt',function(b){b.onclick=function(){var r=find(S.w).r.concat(['잘 모르겠어요'])[+b.getAttribute('data-r')],i=S.rs.indexOf(r);if(i>=0)S.rs.splice(i,1);else S.rs.push(r);render()}});
+ if(q('txt'))q('txt').oninput=function(e){S.txt=e.target.value};
+}
+function each(s,f){Array.prototype.forEach.call(app.querySelectorAll(s),f)}
+reset();render();
+</script>
+</body>
+</html>
