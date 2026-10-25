@@ -14,6 +14,8 @@ h1{font-size:clamp(1.8rem,5vw,2.5rem);color:var(--navy);margin:0 0 8px}
 nav{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0 22px}
 button{font:inherit;cursor:pointer;border:0;border-radius:12px;padding:11px 16px;background:var(--navy);color:white;font-weight:700}
 button.secondary{background:white;color:var(--navy);border:1px solid var(--line)}
+.sendbtn{display:inline-block;margin-top:14px;padding:12px 18px;border-radius:12px;background:#e7742e;color:#fff;font-weight:700;text-decoration:none}
+.sendnote{margin:10px 0 0;color:#606a7c;font-size:.95rem}
 button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid #e7b94c;outline-offset:2px}
 .panel{background:white;border:2px solid var(--line);border-radius:20px;padding:22px;margin:14px 0}
 .panel h2{margin:0 0 6px;color:var(--navy);font-size:1.45rem}
@@ -47,6 +49,8 @@ footer{font-size:.9rem;color:#6b7280;text-align:center;margin-top:26px}
     <h2>🌦️ 공부 날씨 체크인</h2>
     <p class="hint">지금 나의 마음과 공부 준비 상태를 날씨에 빗대어 살펴봐요.</p>
     <div class="progress"><span id="weatherProgress"></span></div>
+    <label for="weatherNick">나의 별명 (이름 말고 나만 아는 별명)</label>
+    <input id="weatherNick" type="text" maxlength="20" placeholder="예: 구름이, 별똥별">
     <label>1. 공부할 때 내 마음의 날씨는 어떤가요?</label>
     <div class="choices" id="weatherChoices">
       <button type="button" class="choice" data-value="☀️ 맑음">☀️ 맑음</button>
@@ -69,7 +73,7 @@ footer{font-size:.9rem;color:#6b7280;text-align:center;margin-top:26px}
     <div class="choices" id="copingChoices">
       <button type="button" class="choice" data-value="계속 노력해요">계속 노력해요</button>
       <button type="button" class="choice" data-value="잠깐 쉬어요">잠깐 쉬어요</button>
-      <button type="button" class="choice" data-value="다른 사람에게 물어봐요">도움을 요청해요</button>
+      <button type="button" class="choice" data-value="도움을 요청해요">도움을 요청해요</button>
       <button type="button" class="choice" data-value="미루거나 포기해요">미루거나 포기해요</button>
       <button type="button" class="choice" data-value="잘 모르겠어요">잘 모르겠어요</button>
     </div>
@@ -80,18 +84,21 @@ footer{font-size:.9rem;color:#6b7280;text-align:center;margin-top:26px}
       <button type="button" class="choice" data-value="충분한 시간">충분한 시간</button>
       <button type="button" class="choice" data-value="응원과 격려">응원과 격려</button>
       <button type="button" class="choice" data-value="함께 공부하기">함께 공부하기</button>
-      <button type="button" class="choice" data-value="스스로 해보고 싶어요">스스로 해보고 싶어요</button>
+      <button type="button" class="choice" data-value="스스로 해 보고 싶어요">스스로 해보고 싶어요</button>
     </div>
     <label for="weatherAction">5. 오늘 공부를 위해 내가 실천할 작은 행동은 무엇인가요?</label>
     <input id="weatherAction" type="text" placeholder="예: 책상 정리하기, 모르는 문제 한 개 질문하기">
     <div style="margin-top:18px"><button type="button" id="saveWeather">체크인 저장하기</button></div>
     <div id="weatherResult" class="result hidden" aria-live="polite"></div>
+    <div id="weatherSendBox" class="hidden"><a id="weatherSend" class="sendbtn" target="_blank" rel="noopener">📤 선생님 화면에 올리기</a><p class="sendnote">버튼을 누르면 내 답이 채워진 화면이 열려요. 거기서 <b>제출</b>을 눌러야 선생님 화면에 나와요.</p></div>
   </section>
 
   <section id="goalPanel" class="panel hidden">
     <h2>🎯 목표 레시피 챌린지</h2>
     <p class="hint">목표를 요리 레시피처럼 작고 구체적인 단계로 만들어 봐요.</p>
     <div class="progress"><span id="goalProgress"></span></div>
+    <label for="goalNick">나의 별명 (이름 말고 나만 아는 별명)</label>
+    <input id="goalNick" type="text" maxlength="20" placeholder="예: 구름이, 별똥별">
     <label for="goalName">1. 이번 학기에 이루고 싶은 목표는 무엇인가요?</label>
     <input id="goalName" type="text" placeholder="예: 매일 15분 책 읽기, 수학 시간에 모르는 문제 질문하기">
     <label for="goalWhy">2. 이 목표를 이루고 싶은 이유</label>
@@ -106,8 +113,23 @@ footer{font-size:.9rem;color:#6b7280;text-align:center;margin-top:26px}
     <textarea id="goalObstacle" placeholder="예: 집중이 안 되면 3분 쉬고 첫 번째 문제만 시작하기"></textarea>
     <label for="goalSupport">7. 나에게 도움이 되는 재료(도움·도구·강점)</label>
     <input id="goalSupport" type="text" placeholder="예: 타이머, 연필, 가족의 응원">
+    <label>8. 이번 주에 정말 할 수 있나요?</label>
+    <div class="choices" id="confChoices">
+      <button type="button" class="choice" data-value="1">1</button>
+      <button type="button" class="choice" data-value="2">2</button>
+      <button type="button" class="choice" data-value="3">3</button>
+      <button type="button" class="choice" data-value="4">4</button>
+      <button type="button" class="choice" data-value="5">5</button>
+      <button type="button" class="choice" data-value="6">6</button>
+      <button type="button" class="choice" data-value="7">7</button>
+      <button type="button" class="choice" data-value="8">8</button>
+      <button type="button" class="choice" data-value="9">9</button>
+      <button type="button" class="choice" data-value="10">10</button>
+    </div>
+    <p class="hint" style="margin:6px 0 0">1 = 어려워요 · 10 = 확실해요 (7점보다 낮으면 목표를 더 작게 줄여 봐요)</p>
     <div style="margin-top:18px"><button type="button" id="saveGoal">나의 목표 레시피 만들기</button></div>
     <div id="goalResult" class="result hidden" aria-live="polite"></div>
+    <div id="goalSendBox" class="hidden"><a id="goalSend" class="sendbtn hidden" target="_blank" rel="noopener">📤 선생님 화면에 올리기</a><p class="sendnote" id="goalSendNote"></p></div>
   </section>
 
   <section id="focusPanel" class="panel hidden" style="padding:0;overflow:hidden">
@@ -125,10 +147,13 @@ footer{font-size:.9rem;color:#6b7280;text-align:center;margin-top:26px}
 <script>
 (() => {
   const $ = id => document.getElementById(id);
+  const FORM_WEATHER = "https://docs.google.com/forms/d/e/1FAIpQLSdSxhUaQ_bES7Kbr5Rcv6adLky_Kspg49GnXFjdVoZ3dv0IyA/viewform";
+  const FORM_GOAL = "https://docs.google.com/forms/d/e/1FAIpQLSeSsYavVKHrSl7QSp1-wY9jlG0QcyogtIE2d9DcqagAWTuY_g/viewform";
   let selectedWeather = "";
   let selectedDifficulty = "";
   let selectedCoping = "";
   let selectedHelp = "";
+  let selectedConf = "";
   const history = (() => { try { return JSON.parse(localStorage.getItem("studyOnHistory") || "[]"); } catch(e) { return []; } })();
 
   function switchTab(which){
@@ -175,13 +200,14 @@ footer{font-size:.9rem;color:#6b7280;text-align:center;margin-top:26px}
   bindChoices("difficultyChoices", v => selectedDifficulty = v);
   bindChoices("copingChoices", v => selectedCoping = v);
   bindChoices("helpChoices", v => selectedHelp = v);
+  bindChoices("confChoices", v => selectedConf = v);
 
   function updateProgress(){
     const weatherCount = [selectedWeather, selectedDifficulty, selectedCoping, selectedHelp, $("weatherAction").value.trim()].filter(Boolean).length;
     $("weatherProgress").style.width = (weatherCount / 5 * 100) + "%";
     const goalIds = ["goalName","goalWhy","goalStep1","goalStep2","goalWhen","goalObstacle","goalSupport"];
     const count = goalIds.filter(id => $(id).value.trim()).length;
-    $("goalProgress").style.width = (count / goalIds.length * 100) + "%";
+    $("goalProgress").style.width = ((count + (selectedConf ? 1 : 0) + ($("goalNick").value.trim() ? 1 : 0)) / (goalIds.length + 2) * 100) + "%";
   }
   document.querySelectorAll("input,textarea").forEach(el => el.addEventListener("input", updateProgress));
 
@@ -191,8 +217,9 @@ footer{font-size:.9rem;color:#6b7280;text-align:center;margin-top:26px}
     renderHistory();
   }
   $("saveWeather").addEventListener("click", () => {
-    if(!selectedWeather || !selectedDifficulty || !selectedCoping || !selectedHelp || !$ ("weatherAction").value.trim()){
-      $("weatherResult").textContent = "1~5번 문항에 답한 뒤 저장해 주세요.";
+    if(!$("weatherNick").value.trim() || !selectedWeather || !selectedDifficulty || !selectedCoping || !selectedHelp || !$ ("weatherAction").value.trim()){
+      $("weatherResult").textContent = "별명과 1~5번 문항에 모두 답한 뒤 저장해 주세요.";
+      $("weatherSendBox").classList.add("hidden");
       $("weatherResult").classList.remove("hidden"); return;
     }
     const action = $("weatherAction").value.trim();
@@ -200,6 +227,17 @@ footer{font-size:.9rem;color:#6b7280;text-align:center;margin-top:26px}
     $("weatherResult").textContent = text;
     $("weatherResult").classList.remove("hidden");
     saveRecord({type:"공부 날씨 체크인", summary:`${selectedWeather} · 어려움: ${selectedDifficulty}`, detail:text});
+    const q = [];
+    const add = (k,v) => q.push(k + "=" + encodeURIComponent(v));
+    add("entry.346024800", $("weatherNick").value.trim());
+    add("entry.1005866807", selectedWeather.replace(/^\S+\s+/, ""));
+    if(selectedDifficulty === "기타"){ add("entry.952673983", "__other_option__"); add("entry.952673983.other_option_response", "기타"); }
+    else add("entry.952673983", selectedDifficulty);
+    add("entry.539930660", selectedCoping);
+    add("entry.1986696026", selectedHelp);
+    add("entry.1942632116", action);
+    $("weatherSend").href = FORM_WEATHER + "?usp=pp_url&" + q.join("&");
+    $("weatherSendBox").classList.remove("hidden");
   });
   $("saveGoal").addEventListener("click", () => {
     const goal = $("goalName").value.trim();
@@ -219,6 +257,19 @@ footer{font-size:.9rem;color:#6b7280;text-align:center;margin-top:26px}
     $("goalResult").textContent = text;
     $("goalResult").classList.remove("hidden");
     saveRecord({type:"목표 레시피 챌린지", summary:goal, detail:text});
+    const gv = id => $(id).value.trim();
+    const need = [gv("goalNick"), gv("goalName"), gv("goalWhy"), gv("goalStep1"), gv("goalStep2"), gv("goalWhen"), gv("goalObstacle"), gv("goalSupport"), selectedConf];
+    const note = $("goalSendNote");
+    if(need.every(Boolean)){
+      const ids = ["entry.553180837","entry.703157126","entry.1548375380","entry.908834363","entry.80784253","entry.1254325486","entry.720630491","entry.662540759","entry.709189674"];
+      $("goalSend").href = FORM_GOAL + "?usp=pp_url&" + ids.map((k,i) => k + "=" + encodeURIComponent(need[i])).join("&");
+      $("goalSend").classList.remove("hidden");
+      note.innerHTML = "버튼을 누르면 내 답이 채워진 화면이 열려요. 거기서 <b>제출</b>을 눌러야 선생님 화면에 나와요.";
+    } else {
+      $("goalSend").classList.add("hidden");
+      note.textContent = "별명과 1~8번을 모두 채우면 '선생님 화면에 올리기' 버튼이 나와요.";
+    }
+    $("goalSendBox").classList.remove("hidden");
   });
   function renderHistory(){
     const host = $("history");
