@@ -45,6 +45,10 @@ input[type=text]{width:100%;font:inherit;font-size:20px;color:var(--ink);backgro
 .two .card{text-align:center;padding:18px 10px;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:22px;font-weight:700}
 .two small{font-size:18px;color:var(--sub);font-weight:500}
 .hero{display:flex;gap:14px;margin:24px 0 28px;flex-wrap:wrap}
+.pp{font:inherit;color:var(--ink);background:var(--card);border:3px solid var(--line);border-radius:16px;padding:8px 10px;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;font-size:18px;font-weight:700;min-width:84px}
+.pp:hover{border-color:var(--yel)}
+.pp[aria-pressed="true"]{border-color:var(--cor);background:var(--sel)}
+.mini{font-size:18px;min-height:44px;padding:8px 18px}
 @media (max-width:520px){.two{grid-template-columns:1fr}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -53,11 +57,21 @@ input[type=text]{width:100%;font:inherit;font-size:20px;color:var(--ink);backgro
 <main id="app"></main>
 <script>
 var W=[
-{k:'sunny',n:'맑음',m:'맑은 날이에요. 이 기분을 기억해 두면 힘이 돼요.',r:['문제를 풀어서 뿌듯한 일','새로운 걸 알게 된 일','공부가 재미있는 시간','칭찬을 받은 일']},
-{k:'cloudy',n:'구름',m:'구름이 낀 날도 있어요. 그럴 수 있어요.',r:['잘 모르는 게 있는 일','할 일이 많은 일','할까 말까 고민되는 일','그냥 보통인 날']},
-{k:'rain',n:'비',m:'비 오는 날도 있어요. 이런 마음을 알아보는 게 첫걸음이에요.',r:['공부가 힘들고 지치는 일','계속 틀려서 속상한 일','혼자 해야 해서 외로운 일','하기 싫은 마음']},
-{k:'storm',n:'번개',m:'마음이 번쩍할 때도 있어요. 그 마음을 말해 주어서 고마워요.',r:['시험이나 발표가 걱정되는 일','시간이 부족해서 급한 일','답답하고 화가 나는 일','잘하고 싶은데 안 되는 일']},
-{k:'rainbow',n:'무지개',m:'무지개가 떴네요! 좋은 마음을 오늘 공부에도 가져가 봐요.',r:['어려운 일을 해낸 일','나아진 내 모습을 발견한 일','친구와 함께 해서 즐거운 일','하고 싶은 게 생긴 일']}
+{k:'sunny',n:'맑음',m:'맑은 날이에요. 이 기분을 기억해 두면 힘이 돼요.',m3:'맑은 날이에요. 3회기 동안 찾은 것들을 실천으로 이어 가 봐요.',
+ r:['문제를 풀어서 뿌듯한 일','새로운 걸 알게 된 일','공부가 재미있는 시간','칭찬을 받은 일'],
+ r3:['내 공부 이유를 찾은 일','내 목표 레시피를 만든 일','집중 방해범을 알게 된 일','핸드폰 잠금 상자를 만든 일']},
+{k:'cloudy',n:'구름',m:'구름이 낀 날도 있어요. 그럴 수 있어요.',m3:'구름이 낀 날도 있어요. 작은 실천부터 천천히 해 봐요.',
+ r:['잘 모르는 게 있는 일','할 일이 많은 일','할까 말까 고민되는 일','그냥 보통인 날'],
+ r3:['내 공부 이유가 아직 또렷하지 않은 일','집중이 잘될지 잘 모르겠는 일','루틴을 지킬 수 있을지 고민되는 일','그냥 보통인 날']},
+{k:'rain',n:'비',m:'비 오는 날도 있어요. 이런 마음을 알아보는 게 첫걸음이에요.',m3:'비 오는 날도 있어요. 힘든 마음을 말해 주어서 고마워요. 루틴을 더 작게 줄여 봐도 좋아요.',
+ r:['공부가 힘들고 지치는 일','계속 틀려서 속상한 일','혼자 해야 해서 외로운 일','하기 싫은 마음'],
+ r3:['여전히 공부가 힘들고 지치는 일','집중 방해범을 이기기 어려운 일','계획대로 안 될까 봐 속상한 일','혼자 해야 해서 외로운 일']},
+{k:'storm',n:'번개',m:'마음이 번쩍할 때도 있어요. 그 마음을 말해 주어서 고마워요.',m3:'마음이 번쩍할 때도 있어요. 그 마음을 알아본 것만으로도 큰 걸음이에요.',
+ r:['시험이나 발표가 걱정되는 일','시간이 부족해서 급한 일','답답하고 화가 나는 일','잘하고 싶은데 안 되는 일'],
+ r3:['집중이 안 돼서 답답하고 화가 나는 일','핸드폰이 자꾸 생각나서 신경 쓰이는 일','실천 약속을 지켜야 해서 부담되는 일','잘하고 싶은데 마음처럼 안 되는 일']},
+{k:'rainbow',n:'무지개',m:'무지개가 떴네요! 좋은 마음을 오늘 공부에도 가져가 봐요.',m3:'무지개가 떴네요! 오늘 만든 약속과 함께 이 마음을 이어 가 봐요.',
+ r:['어려운 일을 해낸 일','나아진 내 모습을 발견한 일','친구와 함께 해서 즐거운 일','하고 싶은 게 생긴 일'],
+ r3:['내가 바뀔 수 있다는 걸 알게 된 일','나만의 목표와 루틴이 생긴 일','친구들의 응원과 아이디어가 힘이 된 일','하고 싶은 공부 방법이 생긴 일']}
 ];
 var col={sunny:'#FFC83D',cloudy:'#9FB3D9',rain:'#6FA3E8',storm:'#7A6FD6',rainbow:'#FF7A59'};
 function icon(k,s){
@@ -71,8 +85,11 @@ function icon(k,s){
 }
 function find(k){return W.filter(function(w){return w.k===k})[0]}
 var app=document.getElementById('app'),S;
-function reset(keepMode){S={mode:keepMode||1,step:-1,past:null,w:null,rs:[],txt:''}}
-function steps(){return S.mode===1?['weather','reason','result']:['past','weather','reason','result']}
+function reset(keepMode){S={mode:keepMode||1,step:-1,past:null,pick:false,w:null,rs:[],txt:''}}
+function steps(){return ['weather','reason','result']}
+function R(w){return S.mode===3?w.r3:w.r}
+function lsGet(k){try{return localStorage.getItem(k)}catch(e){return null}}
+function lsSet(k,v){try{localStorage.setItem(k,v)}catch(e){}}
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
 function go(d){S.step+=d;if(S.step<0)S.step=-1;render()}
 function render(){
@@ -83,23 +100,27 @@ function render(){
   +'<button class="btn go" id="start">시작</button>';
  }else{
   h='<div class="top"><span class="count">'+(S.step+1)+'/'+n+'단계</span><div class="bar"><i style="width:'+Math.round((S.step+1)/n*100)+'%"></i></div></div><div class="card">';
-  if(st==='past'||st==='weather'){
-   var key=st==='past'?S.past:S.w;
-   h+='<h2>'+(st==='past'?'1회기 때 나의 공부 날씨는?':(S.mode===3?'지금 나의 공부 날씨는?':'공부 하면 내 마음은 어떤 날씨인가요?'))+'</h2><p class="lead">'+(st==='past'?'기억나는 날씨를 하나 골라요.':'지금 마음에 가장 가까운 날씨를 하나 골라요.')+'</p><div class="grid">'
-   +W.map(function(w){return '<button class="w" data-w="'+w.k+'" aria-pressed="'+(key===w.k)+'">'+icon(w.k,72)+w.n+'</button>'}).join('')+'</div>';
+  if(st==='weather'){
+   h+='<h2>'+(S.mode===3?'지금 나의 공부 날씨는?':'공부 하면 내 마음은 어떤 날씨인가요?')+'</h2><p class="lead">지금 마음에 가장 가까운 날씨를 하나 골라요.</p><div class="grid">'
+   +W.map(function(w){return '<button class="w" data-w="'+w.k+'" aria-pressed="'+(S.w===w.k)+'">'+icon(w.k,72)+w.n+'</button>'}).join('')+'</div>';
   }else if(st==='reason'){
    var w=find(S.w);
-   h+='<h2>'+w.n+' 날씨인 이유는 무엇인가요?</h2><p class="lead">해당하는 것을 모두 골라요. 건너뛰어도 괜찮아요.</p><ul class="opts">'
-   +w.r.concat(['잘 모르겠어요']).map(function(r,i){var on=S.rs.indexOf(r)>=0;return '<li><button class="opt" data-r="'+i+'" aria-pressed="'+on+'"><span class="box">'+(on?'✓':'')+'</span>'+r+'</button></li>'}).join('')
+   h+='<h2>'+w.n+' 날씨인 이유는 무엇인가요?</h2><p class="lead">'+(S.mode===3?'3회기 수업을 마친 지금의 마음이에요. ':'')+'해당하는 것을 모두 골라요. 건너뛰어도 괜찮아요.</p><ul class="opts">'
+   +R(w).concat(['잘 모르겠어요']).map(function(r,i){var on=S.rs.indexOf(r)>=0;return '<li><button class="opt" data-r="'+i+'" aria-pressed="'+on+'"><span class="box">'+(on?'✓':'')+'</span>'+r+'</button></li>'}).join('')
    +'</ul><input type="text" id="txt" maxlength="30" placeholder="직접 쓰기 (30자 이내)" value="'+esc(S.txt)+'" aria-label="직접 쓰기">';
   }else{
    var w=find(S.w),why=S.rs.filter(function(r){return r!=='잘 모르겠어요'});if(S.txt.trim())why.push(S.txt.trim());
-   h+='<h2>'+(S.mode===3?'오늘의 공부 날씨 확인':'나의 공부 날씨')+'</h2><div style="display:flex;align-items:center;gap:14px;margin-top:8px">'+icon(w.k,84)+'<p style="font-size:30px;font-weight:800">'+w.n+'</p></div><div class="msg">'+w.m+'</div>';
-   if(S.mode===3&&S.past){var p=find(S.past);h+='<div class="two"><div class="card">1회기<span>'+icon(p.k,72)+'</span>'+p.n+'</div><div class="card">지금<span>'+icon(w.k,72)+'</span>'+w.n+'</div></div><div class="msg">'+(S.past===S.w?'1회기와 같은 날씨예요. 같아도 괜찮아요. ':'1회기와 다른 날씨예요. ')+'날씨는 바뀔 수도, 그대로일 수도 있어요.</div>'}
+   h+='<h2>'+(S.mode===3?'오늘의 공부 날씨 확인':'나의 공부 날씨')+'</h2><div style="display:flex;align-items:center;gap:14px;margin-top:8px">'+icon(w.k,84)+'<p style="font-size:30px;font-weight:800">'+w.n+'</p></div><div class="msg">'+(S.mode===3?w.m3:w.m)+'</div>';
+   if(S.mode===1){lsSet('sw1',S.w)}
+   else if(!S.past&&!S.pick){var sv=lsGet('sw1');if(sv&&find(sv))S.past=sv}
+   if(S.mode===3){
+    if(S.past&&!S.pick){var p=find(S.past);h+='<div class="two"><div class="card">1회기<span>'+icon(p.k,72)+'</span>'+p.n+'</div><div class="card">지금<span>'+icon(w.k,72)+'</span>'+w.n+'</div></div><div class="msg">'+(S.past===S.w?'1회기와 같은 날씨예요. 같아도 괜찮아요. ':'1회기와 다른 날씨예요. ')+'날씨는 바뀔 수도, 그대로일 수도 있어요.</div><div class="row" style="margin-top:14px"><button class="btn ghost mini" id="fixp">1회기 날씨가 달라요</button></div>'}
+    else{h+='<div class="msg">1회기 날씨가 기억나면 골라 보세요. 안 골라도 괜찮아요.</div><div class="hero" style="margin:14px 0 0">'+W.map(function(x){return '<button class="pp" data-p="'+x.k+'" aria-pressed="'+(S.past===x.k)+'">'+icon(x.k,44)+x.n+'</button>'}).join('')+'</div>'}
+   }
    h+='<div class="say">모둠에서 이렇게 말해 봐요.<br>“나는 '+w.n+' 날씨예요. 왜냐하면 '+(why.length?esc(why.join(', '))+' 때문이에요.':'___ 때문이에요.')+'”</div>';
   }
   h+='<div class="row"><button class="btn ghost" id="prev">이전</button>';
-  h+=st==='result'?'<button class="btn" id="again">다시 하기</button>':'<button class="btn go" id="next"'+(((st==='past'&&!S.past)||(st==='weather'&&!S.w))?' disabled':'')+'>다음</button>';
+  h+=st==='result'?'<button class="btn" id="again">다시 하기</button>':'<button class="btn go" id="next"'+((st==='weather'&&!S.w)?' disabled':'')+'>다음</button>';
   h+='</div></div>';
  }
  app.innerHTML=h;
@@ -108,9 +129,11 @@ function render(){
  if(q('next'))q('next').onclick=function(){go(1)};
  if(q('prev'))q('prev').onclick=function(){go(-1)};
  if(q('again'))q('again').onclick=function(){reset(S.mode);render()};
- each('.mode',function(b){b.onclick=function(){S.mode=+b.getAttribute('data-m');render()}});
- each('.w',function(b){b.onclick=function(){var k=b.getAttribute('data-w');if(st==='past')S.past=k;else{if(S.w!==k){S.rs=[];S.txt=''}S.w=k}render()}});
- each('.opt',function(b){b.onclick=function(){var r=find(S.w).r.concat(['잘 모르겠어요'])[+b.getAttribute('data-r')],i=S.rs.indexOf(r);if(i>=0)S.rs.splice(i,1);else S.rs.push(r);render()}});
+ each('.mode',function(b){b.onclick=function(){S.mode=+b.getAttribute('data-m');S.w=null;S.rs=[];S.txt='';S.past=null;S.pick=false;render()}});
+ each('.w',function(b){b.onclick=function(){var k=b.getAttribute('data-w');if(S.w!==k){S.rs=[];S.txt=''}S.w=k;render()}});
+ each('.pp',function(b){b.onclick=function(){S.past=b.getAttribute('data-p');S.pick=false;render()}});
+ if(q('fixp'))q('fixp').onclick=function(){S.pick=true;render()};
+ each('.opt',function(b){b.onclick=function(){var r=R(find(S.w)).concat(['잘 모르겠어요'])[+b.getAttribute('data-r')],i=S.rs.indexOf(r);if(i>=0)S.rs.splice(i,1);else S.rs.push(r);render()}});
  if(q('txt'))q('txt').oninput=function(e){S.txt=e.target.value};
 }
 function each(s,f){Array.prototype.forEach.call(app.querySelectorAll(s),f)}
