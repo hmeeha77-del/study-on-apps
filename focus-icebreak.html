@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>아이스브레이킹: 우리 통했나?</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{font-family:'Noto Sans KR','Malgun Gothic',sans-serif;background:#FAF8F3;color:#2B3A67;font-size:clamp(14px,1.4vw,22px)}
+button{font-family:inherit;cursor:pointer;border:0;border-radius:14px;padding:.6em 1.1em;font-size:1em;font-weight:700}
+.hide{display:none!important}
+#setup{max-width:900px;margin:0 auto;padding:24px}
+h1{margin:0 0 4px;font-size:2em}.sub{color:#0E7C70;font-weight:700;margin-bottom:14px}
+.card{background:#fff;border-radius:20px;padding:18px;margin-bottom:12px;box-shadow:0 2px 8px #0001}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:8px 0}
+.mode{background:#E3F6F3;color:#0E7C70}.mode.on{background:#1FB5A3;color:#fff}
+input[type=text]{font-family:inherit;font-size:1em;padding:.5em .7em;border:2px solid #cfd6e6;border-radius:12px}
+.go{background:#FFC83D;color:#16294F;width:100%;font-size:1.3em;padding:.8em}
+.note{font-size:.85em;color:#5b6690;line-height:1.5}
+#game{display:flex;flex-direction:column;height:100vh;padding:1.2vh 2vw;gap:1.2vh}
+.top{display:flex;justify-content:space-between;align-items:center;gap:1vw}
+.chip{border-radius:18px;padding:.6vh 1.4vw;color:#fff;font-weight:800;font-size:1.5em}
+.c0{background:#2B6BD6}.c1{background:#E8743B}
+.mid{font-weight:800;text-align:center;font-size:1.2em}
+.main{flex:1;background:#fff;border-radius:24px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2vh;padding:2vh 2vw;box-shadow:0 2px 10px #0001;min-height:0;overflow:auto}
+.q{font-size:2.2em;font-weight:800;text-align:center;color:#16294F}
+.pair{display:flex;gap:3vw;width:100%;justify-content:center}
+.opt{flex:1;max-width:38vw;border-radius:28px;padding:4vh 2vw;text-align:center;font-size:2.2em;font-weight:800;background:#EEF0F6;border:6px solid transparent;position:relative}
+.opt small{display:block;font-size:.5em;opacity:.7;margin-bottom:1vh}
+.opt.a{background:#E3F6F3}.opt.b{background:#FFF1CC}
+.opt.win{border-color:#1FB5A3;box-shadow:0 0 0 8px #1FB5A333}
+.who{display:flex;gap:.6em;justify-content:center;margin-top:1.2vh;font-size:.55em;min-height:1.6em}
+.tag{border-radius:99px;padding:.1em .8em;color:#fff}
+.st{font-size:1.4em;font-weight:700;text-align:center;min-height:1.4em}
+.res{font-size:2.4em;font-weight:800;text-align:center}
+.bar{display:flex;gap:1vw;justify-content:center;flex-wrap:wrap;align-items:center}
+.pk{display:flex;gap:.6em;align-items:center;font-weight:800}
+.pk button{color:#fff;padding:.5em 1.2em}
+.ok{background:#1FB5A3;color:#fff}.sec{background:#eef0f6;color:#2B3A67}
+.cardq{font-size:2.8em;font-weight:800;text-align:center;line-height:1.4;color:#16294F;background:#FFF1CC;border-radius:28px;padding:5vh 4vw;max-width:80vw}
+.first{font-size:1.8em;font-weight:800}
+.big{font-size:clamp(60px,9vw,160px);font-weight:800;color:#0E7C70;line-height:1}
+.hints{display:flex;gap:.6vw;flex-wrap:wrap;justify-content:center}
+.hints span{background:#E3F6F3;border-radius:99px;padding:.2em .9em;font-weight:700}
+.list{width:100%;max-width:70vw;max-height:26vh;overflow:auto;font-size:1.2em;line-height:1.7}
+.tm{font-size:2.4em;font-weight:800;color:#0E7C70}.tm.low{color:#c0392b}
+</style></head><body>
+
+<div id="setup">
+  <h1>🧊 아이스브레이킹: 우리 통했나? <span style="font-size:.5em">큰 화면용</span></h1>
+  <div class="sub">이기고 지는 게임이 아니에요. 둘이 얼마나 통하는지 알아봐요!</div>
+  <div class="card">
+    <div class="row"><b>별명</b>
+      <input type="text" id="n0" placeholder="별명 1" maxlength="8" style="width:9em">
+      <span style="font-weight:800">&amp;</span>
+      <input type="text" id="n1" placeholder="별명 2" maxlength="8" style="width:9em"></div>
+    <p class="note">진짜 이름 말고 <b>별명</b>만 써도 돼요.</p>
+    <b>게임 고르기</b>
+    <div class="row">
+      <button class="mode on" data-m="bal">⚖️ 밸런스 게임</button>
+      <button class="mode" data-m="card">🃏 질문 카드</button>
+      <button class="mode" data-m="com">🤝 공통점 찾기</button>
+    </div>
+    <p class="note" id="md"></p>
+  </div>
+  <button class="go" id="start">시작!</button>
+</div>
+
+<div id="game" class="hide">
+  <div class="top"><div class="chip c0" id="nm0"></div><div class="mid" id="info"></div><div class="chip c1" id="nm1"></div></div>
+  <div class="main" id="main"></div>
+  <div class="bar" id="ctl"></div>
+</div>
+
+<script>
+const BAL=[
+["아침형 🌅","밤형 🌙"],["혼자 공부하기","친구와 같이 공부하기"],["공부할 때 음악 듣기 🎧","조용한 곳에서 공부하기"],
+["숙제 먼저 하고 놀기","놀고 나서 숙제하기"],["떡볶이 🌶️","치킨 🍗"],["강아지 🐶","고양이 🐱"],["여름 ☀️","겨울 ❄️"],
+["계획표를 꼼꼼히 짜기","그때그때 하고 싶은 대로"],["시험 전날 벼락치기","매일 조금씩 미리 하기"],["수학 ➗","국어 📖"],
+["모르는 문제 바로 물어보기","끝까지 혼자 고민하기"],["책상을 깨끗이 정리하고 시작","일단 시작하고 정리는 나중에"],
+["투명인간 되기","하늘을 나는 능력"],["시간 멈추기 ⏱️","순간이동 ✨"],["마라탕","탕후루"],["영상 보며 쉬기 📺","밖에서 뛰어놀며 쉬기 ⚽"],
+["발표 제일 먼저 하기","발표 제일 마지막에 하기"],["필기를 많이 하며 공부","머릿속으로 이해하며 공부"],["방학이 한 달 더","주말이 하루 더"],
+["새 학기 새 친구들","익숙한 단짝 친구"],["달리기 🏃","그림 그리기 🎨"],["책 읽기 📚","게임하기 🎮"],["아이스크림 🍦","따뜻한 핫초코 ☕"],["일찍 도착해서 기다리기","아슬아슬하게 도착하기"]
+];
+const CARDS=["내가 좋아하는 간식 한 가지는?","요즘 가장 빠져 있는 것은?","쉬는 날 제일 하고 싶은 것은?","내가 잘한다고 생각하는 것 한 가지는?","내 별명(또는 이름)에 담긴 이야기는?","좋아하는 계절과 그 이유는?","지금까지 먹은 것 중 제일 맛있었던 음식은?","공부할 때 가장 힘든 순간은 언제?","올해 꼭 해 보고 싶은 것은?","내가 제일 좋아하는 과목과 이유는?","하루 동안 마법을 쓸 수 있다면 뭘 하고 싶어?","좋아하는 노래나 영상이 있다면?","공부하다 집중이 잘될 때는 언제?","친구에게 받으면 기분 좋은 말은?","내가 가고 싶은 여행지는?","어릴 때부터 계속 좋아하는 것은?","무인도에 하나만 가져간다면?","오늘 기분을 날씨로 말하면?","내가 닮고 싶은 사람은?","나만의 기분 전환 방법은?"];
+const HINTS=["좋아하는 음식","좋아하는 놀이","좋아하는 동물","좋아하는 계절","좋아하는 과목","잘하는 것","쉬는 날 하는 일","공부 습관","싫어하는 것","가고 싶은 곳"];
+const MD={bal:'문제가 뜨면 5초 동안 마음속으로 고르고, “딩동!” 소리가 나면 동시에 말로 외쳐요. 같은지 다른지 보고 왜 골랐는지 이야기해 봐요. (8문제 · 선생님이 Enter로 넘겨요)',card:'질문 카드를 뽑고, 두 친구가 차례로 대답해요. 서로 궁금한 걸 더 물어봐도 좋아요.',com:'90초 동안 둘의 공통점을 최대한 많이 찾아요. 찾으면 한 줄로 써서 추가해요. 둘이 힘을 합치는 게임이에요!'};
+let mode='bal',G=null,timer=null;
+const $=s=>document.querySelector(s);
+const shuf=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+document.querySelectorAll('.mode').forEach(b=>b.onclick=()=>{mode=b.dataset.m;document.querySelectorAll('.mode').forEach(x=>x.classList.toggle('on',x===b));$('#md').textContent=MD[mode]});
+$('#md').textContent=MD.bal;
+function ctl(h){$('#ctl').innerHTML=h;$('#ctl').querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>act(b.dataset.a))}
+function act(a){
+  if(a==='quit')return quit();
+  if(!G)return;
+  if(a==='next')return G.mode==='bal'?balNext():G.mode==='card'?drawCard():null;
+  if(a==='go')return comStart();
+  if(a==='add')return comAdd();
+  if(a==='undo')return comUndo();
+}
+function quit(){clearInterval(timer);G=null;$('#game').classList.add('hide');$('#setup').classList.remove('hide')}
+$('#start').onclick=()=>{
+  clearInterval(timer);
+  const names=[$('#n0').value.trim()||'친구1',$('#n1').value.trim()||'친구2'];
+  G={mode,names};$('#nm0').textContent=names[0];$('#nm1').textContent=names[1];
+  $('#setup').classList.add('hide');$('#game').classList.remove('hide');
+  if(mode==='bal')balStart();else if(mode==='card')cardStart();else comReady();
+};
+
+/* ---------- 밸런스 게임 (문제 → 자동 카운트다운+소리 → 외치기, 선생님은 Enter로 넘김) ---------- */
+let AC=null;
+function beep(f,d,t,v){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();
+  const o=AC.createOscillator(),g=AC.createGain();o.type=t||'sine';o.frequency.value=f;g.gain.value=v||0.18;
+  o.connect(g);g.connect(AC.destination);const n=AC.currentTime;g.gain.setValueAtTime(v||0.18,n);g.gain.exponentialRampToValueAtTime(0.001,n+d);o.start(n);o.stop(n+d)}catch(e){}}
+function tick(){beep(660,0.12,'square',0.1)}
+function ding(){beep(988,0.35,'sine',0.25);setTimeout(()=>beep(1319,0.6,'sine',0.25),180)}
+const THINK=5;
+function balStart(){G.Q=shuf(BAL).slice(0,8);G.i=0;G.step=1;balDraw();balRun()}
+function balDraw(){
+  if(G.i>=G.Q.length)return balEnd();
+  const [a,b]=G.Q[G.i];
+  $('#info').textContent=`${G.i+1} / ${G.Q.length}`;
+  const bottom=G.step===1?`<div class="st">마음속으로 골라 보세요 🤔 소리가 “딩동!” 하면 동시에 외쳐요</div><div class="big" id="cnt">${G.n}</div>`:
+    `<div class="res" style="color:#0E7C70">🗣️ 지금! 1번인지 2번인지 동시에 외쳐요!</div><div class="st">같으면 하이파이브 🙌 · 다르면 왜 골랐는지 말해 봐요</div>`;
+  $('#main').innerHTML=`<div class="q">어느 쪽이 더 좋아?</div>
+  <div class="pair"><div class="opt a"><small>1번</small>${a}</div><div class="opt b"><small>2번</small>${b}</div></div>${bottom}`;
+  ctl(G.step===1?`<button class="sec" data-a="quit">✖ 그만하기</button>`:
+      `<button class="ok" data-a="next">${G.i+1>=G.Q.length?'마치기':'다음 문제 ▶ (Enter)'}</button><button class="sec" data-a="quit">✖ 그만하기</button>`);
+}
+function balRun(){
+  clearInterval(timer);G.n=THINK;G.step=1;balDraw();tick();
+  timer=setInterval(()=>{if(!G||G.mode!=='bal'){clearInterval(timer);return}
+    G.n--;
+    if(G.n>0){const e=$('#cnt');if(e)e.textContent=G.n;tick()}
+    else{clearInterval(timer);G.step=2;ding();balDraw()}},1000);
+}
+function balNext(){
+  if(G.step===2){G.i++;if(G.i>=G.Q.length)return balDraw();balRun()}
+}
+function balEnd(){
+  $('#info').textContent='끝!';
+  $('#main').innerHTML=`<div class="big" style="font-size:clamp(50px,7vw,120px)">수고했어요! 🎉</div><div class="res" style="font-size:1.8em">같았던 질문 하나를 골라<br>왜 그렇게 생각했는지 이야기해 봐요.</div>`;
+  ctl(`<button class="ok" data-a="quit">처음으로</button>`);
+}
+
+/* ---------- 질문 카드 ---------- */
+function cardStart(){G.deck=shuf(CARDS);G.i=-1;G.first=Math.random()<.5?0:1;drawCard()}
+function drawCard(){
+  G.i++;if(G.i>=G.deck.length){G.deck=shuf(CARDS);G.i=0}
+  G.first=1-G.first;
+  $('#info').textContent=`질문 카드 ${G.i+1}`;
+  $('#main').innerHTML=`<div class="cardq">${G.deck[G.i]}</div><div class="first">🎲 <span style="color:${G.first?'#E8743B':'#2B6BD6'}">${G.names[G.first]}</span> 먼저 대답해요!</div><div class="st">대답을 듣고 궁금한 걸 하나 더 물어봐도 좋아요.</div>`;
+  ctl(`<button class="ok" data-a="next">🃏 다음 카드 (Enter)</button><button class="sec" data-a="quit">✖ 그만하기</button>`);
+}
+
+/* ---------- 공통점 찾기 ---------- */
+const COM_T=90;
+function comReady(){
+  G.items=[];G.left=COM_T;G.run=false;$('#info').textContent='공통점 찾기';
+  $('#main').innerHTML=`<div class="q">${COM_T}초 동안 우리 둘의 공통점을 찾아요!</div><div class="hints">${HINTS.map(h=>`<span>${h}</span>`).join('')}</div><div class="st">서로 질문하며 찾고, 찾으면 한 줄로 써서 추가해요.<br>예) 둘 다 떡볶이를 좋아해요</div>`;
+  ctl(`<button class="ok" data-a="go">▶ 시작! (Enter)</button><button class="sec" data-a="quit">✖ 그만하기</button>`);
+}
+function comStart(){
+  if(G.run)return;G.run=true;const t0=Date.now();clearInterval(timer);
+  comDraw();
+  timer=setInterval(()=>{if(!G||G.mode!=='com')return;G.left=Math.max(0,COM_T-(Date.now()-t0)/1000);const e=$('#tm');if(e){e.textContent='⏱ '+Math.ceil(G.left)+'초';e.classList.toggle('low',G.left<=15)}
+    if(G.left<=0){clearInterval(timer);G.run=false;comEnd()}},200);
+}
+function comDraw(){
+  $('#info').textContent=`공통점 ${G.items.length}개`;
+  $('#main').innerHTML=`<div class="tm" id="tm">⏱ ${Math.ceil(G.left)}초</div><div class="big">${G.items.length}</div>
+  <div class="row" style="justify-content:center;width:100%"><input type="text" id="ci" placeholder="찾은 공통점을 한 줄로 쓰고 Enter" style="width:min(60vw,700px);font-size:1.3em" maxlength="40"><button class="ok" id="addb">➕ 추가</button></div>
+  <div class="list">${G.items.map((x,i)=>`${i+1}. ${x}`).join('<br>')||'<span class="note">아직 없어요. 먼저 서로 물어봐요!</span>'}</div>
+  <div class="hints">${HINTS.map(h=>`<span>${h}</span>`).join('')}</div>`;
+  const ci=$('#ci');ci.focus();ci.onkeydown=e=>{if(e.key==='Enter')comAdd()};$('#addb').onclick=comAdd;
+  ctl(`<button class="sec" data-a="undo">↩ 마지막 지우기</button><button class="sec" data-a="quit">✖ 그만하기</button>`);
+}
+function comAdd(){if(!G.run)return;const v=$('#ci').value.trim();if(!v)return;G.items.push(v);comDraw()}
+function comUndo(){if(!G.run)return;G.items.pop();comDraw()}
+function comEnd(){
+  const n=G.items.length;
+  $('#info').textContent='끝!';
+  $('#main').innerHTML=`<div class="q">우리의 공통점</div><div class="big">${n}개!</div>
+  <div class="list">${G.items.map((x,i)=>`${i+1}. ${x}`).join('<br>')||'아직 못 찾았어요. 이제부터 천천히 찾아가요!'}</div>
+  <div class="res" style="font-size:1.6em">${n>=6?'정말 잘 통하는 사이예요! 🎉':n>=3?'닮은 점이 꽤 많아요!':'서로 다른 매력이 많아요. 앞으로 더 알아가요 😊'}</div>`;
+  ctl(`<button class="ok" data-a="quit">처음으로</button>`);
+}
+
+document.addEventListener('keydown',e=>{
+  if(!G||e.repeat)return;
+  if(G.mode==='com'&&document.activeElement&&document.activeElement.id==='ci')return;
+  const m={Enter:'enter',NumpadEnter:'enter',Space:'enter',KeyN:'next'}[e.code];
+  if(!m)return;
+  if(m==='enter'||m==='next'){e.preventDefault();if(G.mode==='com'){if(!G.run&&G.left===COM_T)act('go')}else act('next')}
+});
+</script></body></html>
