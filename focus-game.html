@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>집중력 워밍업 게임</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:'Noto Sans KR','Malgun Gothic',sans-serif;background:#FAF8F3;color:#2B3A67;min-height:100vh}
+.wrap{max-width:720px;margin:0 auto;padding:16px}
+h1{font-size:24px;margin:8px 0 4px}
+.sub{color:#0E7C70;font-weight:700;font-size:14px;margin-bottom:12px}
+.card{background:#fff;border-radius:18px;padding:16px;margin-bottom:12px;box-shadow:0 2px 8px #0001}
+.modes{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+button{font-family:inherit;cursor:pointer;border:0;border-radius:12px;padding:12px;font-size:16px;font-weight:700}
+.mode{background:#E3F6F3;color:#0E7C70;font-size:15px}
+.mode.on{background:#1FB5A3;color:#fff}
+.primary{background:#FFC83D;color:#16294F;width:100%;font-size:18px}
+.sec{background:#eef0f6;color:#2B3A67}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+label.sw{display:flex;gap:8px;align-items:center;font-weight:700;background:#FFE3D6;border-radius:12px;padding:10px 12px}
+.bar{display:flex;justify-content:space-between;font-weight:700;margin-bottom:8px}
+.big{font-size:56px;letter-spacing:8px;text-align:center;font-weight:800;margin:10px 0;color:#16294F}
+.hint{text-align:center;font-size:18px;color:#0E7C70;margin-bottom:10px}
+input[type=text]{width:100%;font-size:22px;padding:12px;border:2px solid #cfd6e6;border-radius:12px;font-family:inherit;text-align:center}
+.tiles{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:10px 0}
+.tile{width:64px;height:64px;font-size:30px;background:#2B3A67;color:#fff;border-radius:14px}
+.tile.used{opacity:.25}
+.slot{width:64px;height:64px;border:3px dashed #1FB5A3;border-radius:14px;font-size:30px;font-weight:800;display:flex;align-items:center;justify-content:center;background:#fff}
+.msg{min-height:26px;text-align:center;font-weight:700}
+.grid{display:grid;gap:4px;margin:10px auto;max-width:420px;touch-action:manipulation}
+.cell{aspect-ratio:1;font-size:22px;background:#f1f3f9;color:#2B3A67;padding:0;border-radius:10px}
+.cell.pick{background:#FFC83D}.cell.found{background:#1FB5A3;color:#fff}
+.words{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.words span{background:#eef0f6;border-radius:999px;padding:4px 12px;font-weight:700}
+.words span.ok{background:#1FB5A3;color:#fff;text-decoration:line-through}
+table{width:100%;border-collapse:collapse}td,th{padding:8px;border-bottom:1px solid #e3e6ef;text-align:center}
+.hide{display:none}
+.cd{height:10px;background:#e3e6ef;border-radius:99px;overflow:hidden;margin:4px 0 10px}.cd i{display:block;height:100%;background:#1FB5A3;width:100%}.cdt{text-align:center;font-weight:700;color:#0E7C70}
+.note{font-size:14px;color:#5b6690;line-height:1.5}
+#toast{position:fixed;left:50%;top:14px;transform:translateX(-50%);background:#16294F;color:#fff;border-radius:14px;padding:12px 18px;font-weight:700;z-index:9;pointer-events:none;opacity:0;transition:opacity .2s}
+#toast.show{opacity:1}
+.float{position:fixed;font-size:44px;z-index:8;pointer-events:none;animation:fl 3.2s linear forwards}
+@keyframes fl{from{transform:translateX(-80px) rotate(0)}to{transform:translateX(110vw) rotate(360deg)}}
+</style></head><body>
+<div id="toast"></div>
+<div class="wrap">
+<h1>🧠 집중력 워밍업 게임</h1>
+<div class="sub">점수 대결이 아니에요! 나의 집중 상태를 알아보는 게임이에요.</div>
+
+<div class="card" id="setup">
+  <div class="row" style="margin-bottom:10px"><b>게임 고르기</b></div>
+  <div class="modes">
+    <button class="mode on" data-m="cho">🔤 초성 퀴즈</button>
+    <button class="mode" data-m="scr">🔀 흩어진 글자</button>
+    <button class="mode" data-m="find">🔍 단어 찾기</button>
+  </div>
+  <p class="note" id="modeDesc"></p>
+  <div class="row" style="margin:10px 0"><b>단어 묶음</b>
+    <select id="cat" style="font-size:16px;padding:8px;border-radius:10px;font-family:inherit"><option value="study">📚 공부·집중 단어</option><option value="fun">🎮 요즘 관심 단어 (공부와 관계없음)</option><option value="mix">🔀 섞어서</option></select></div>
+  <p class="note" id="catDesc"></p>
+  <div class="row" style="margin:10px 0"><b>난이도</b><select id="lv" style="font-size:16px;padding:8px;border-radius:10px;font-family:inherit"><option value="hard">🔥 어렵게</option><option value="normal">🙂 보통</option></select></div>
+  <p class="note" id="lvDesc"></p>
+  <label class="sw"><input type="checkbox" id="dist"> 📱 방해 모드 (알림·이모지가 날아와요)</label>
+  <p class="note">① 방해 없이 한 판 → ② 방해 모드로 한 판 → 시간과 느낌을 비교해 봐요.</p>
+  <button class="primary" id="start">시작하기</button>
+</div>
+
+<div class="card hide" id="play">
+  <div class="bar"><span id="qno"></span><span id="timer">⏱ 0초</span><button class="sec" id="quit" style="padding:6px 12px;font-size:14px">✖ 그만하기</button></div>
+  <div id="stage"></div>
+  <div class="msg" id="msg"></div>
+</div>
+
+<div class="card hide" id="result">
+  <h2 style="margin:0 0 6px" id="resTitle">끝!</h2>
+  <p id="resText" style="font-size:18px"></p>
+  <label for="feel" style="font-weight:700">내 집중 느낌 (1 흐트러짐 ~ 5 쏙 빠짐)</label>
+  <div class="row" id="feel" style="margin:8px 0">
+    <button class="sec" data-f="1">1</button><button class="sec" data-f="2">2</button><button class="sec" data-f="3">3</button><button class="sec" data-f="4">4</button><button class="sec" data-f="5">5</button>
+  </div>
+  <button class="primary" id="again">다시 하기 / 모드 바꾸기</button>
+</div>
+
+<div class="card" id="logCard">
+  <b>내 기록 (이 화면에서만 보여요)</b>
+  <table><thead><tr><th>게임</th><th>방해</th><th>시간</th><th>틀린 수</th><th>느낌</th></tr></thead><tbody id="log"></tbody></table>
+  <p class="note" id="cmp"></p>
+</div>
+</div>
+
+<script>
+const STUDY=[
+["책상","공부할 때 앉는 곳",1],
+["연필","글씨 쓰는 도구",1],
+["지우개","틀린 글씨를 지우는 것",1],
+["공책","글씨를 적는 노트",1],
+["숙제","집에서 해 오는 공부",1],
+["시간표","수업 순서가 적힌 표",1],
+["급식","학교에서 먹는 점심",1],
+["가방","책을 넣어 메는 것",1],
+["교과서","수업에서 쓰는 책",1],
+["도서관","책을 빌리는 곳",1],
+["칠판","선생님이 글씨를 쓰는 판",1],
+["휴식","잠깐 쉬는 시간",1],
+["시작","처음 출발하기",1],
+["약속","꼭 지키기로 한 말",1],
+["칭찬","잘했다고 말해 주기",1],
+["독서","책 읽기",1],
+["목표","이루고 싶은 것",1],
+["계획","할 일을 미리 정하는 것",1],
+["타이머","시간을 재 주는 도구",1],
+["알림장","내일 준비물을 적는 공책",1],
+["준비물","수업에 가져가야 하는 물건",1],
+["쉬는시간","수업 사이에 쉬는 때",1],
+["집중력","마음을 한곳에 모으는 힘",2],
+["스마트폰","전화, 검색, 게임이 다 되는 기기",2],
+["알림","띵동! 화면에 뜨는 소식",2],
+["방해","하는 일을 못 하게 막는 것",2],
+["루틴","매일 하는 순서",2],
+["심호흡","숨을 크게 쉬기",2],
+["복습","배운 걸 다시 보기",2],
+["예습","미리 살펴보기",2],
+["습관","자주 하다 몸에 밴 행동",2],
+["도전","어려운 일에 맞서기",2],
+["정리","어지러운 걸 가지런히",2],
+["노력","애써서 하는 것",2],
+["성장","쑥쑥 자라는 것",2],
+["실천","생각한 걸 행동으로 옮기기",2],
+["점검","잘 됐는지 살펴보기",2],
+["반성","잘못한 점을 돌아보기",2],
+["요약","핵심만 짧게 줄이기",2],
+["필기","수업 내용을 적기",2],
+["암기","외워서 기억하기",2],
+["이해","뜻을 알아듣기",2],
+["질문","궁금한 걸 묻기",2],
+["끈기","포기하지 않고 계속하는 힘",2],
+["자신감","나를 믿는 마음",2],
+["책임감","맡은 일을 끝까지 하려는 마음",2],
+["오답노트","틀린 문제를 모아 적은 공책",2],
+["마감","끝내기로 한 때",2],
+["성실","정성을 다해 맡은 일을 하는 마음",2],
+["선택","여러 개 중에 고르기",2],
+["스스로","남이 시키지 않아도 내 힘으로",2],
+["딴생각","다른 데로 가는 생각",2],
+["몰입","푹 빠져서 하는 것",2],
+["자기주도","스스로 계획하고 실천하는 것",3],
+["메타인지","내가 아는 것과 모르는 것을 아는 힘",3],
+["동기부여","하고 싶은 마음을 불러일으키기",3],
+["우선순위","먼저 할 일의 순서",3],
+["시간관리","시간을 알맞게 쓰기",3],
+["자기평가","내가 한 일을 스스로 살펴보기",3],
+["목표설정","이루고 싶은 것을 정하기",3],
+["학습계획","공부할 계획",3],
+["자기조절","내 마음과 행동을 다스리기",3],
+["피드백","잘한 점·고칠 점 알려 주기",3],
+["인내심","참고 견디는 마음",3],
+["성취감","해냈을 때 느끼는 뿌듯함",3],
+["자율성","스스로 정하고 행동하는 힘",3],
+["꾸준함","오래 계속하는 것",3],
+["의지","하려는 굳은 마음",3],
+["자제력","하고 싶어도 참는 힘",3],
+["유혹","마음을 끌어당기는 것",3],
+["미루기","할 일을 나중으로 넘기는 것",3],
+["체크리스트","한 일을 표시하는 목록",3],
+["집중방해범","집중을 막는 범인",3],
+["공부계획표","공부할 계획을 적은 표",3],
+["자기주도학습","스스로 계획하고 공부하는 것",3],
+["자기효능감","나는 할 수 있다는 믿음",3],
+["학습전략","공부를 잘하는 나만의 방법",3],
+["시간배분","시간을 나눠 쓰기",3],
+["분산학습","나눠서 여러 번 공부하기",3],
+["인출연습","책 덮고 떠올려 보기",3],
+["자기점검","스스로 확인하기",3],
+["학습일지","공부한 걸 기록하는 일기",3],
+["성찰일지","돌아보며 쓰는 기록",3],
+["목표달성","목표를 이루기",3],
+["계획수정","계획을 알맞게 고치기",3],
+["자기관리","내 시간과 행동 돌보기",3],
+["집중력저하","집중이 떨어지는 것",3],
+["내적동기","내 마음에서 나온 하고 싶음",3],
+["외적동기","상이나 칭찬 때문에 하고 싶음",3],
+["실행력","계획을 해내는 힘",3],
+["습관형성","몸에 밴 행동 만들기",3],
+["환경설정","공부하기 좋게 주변 꾸미기",3],
+["방해요소","집중을 방해하는 것들",3],
+["완급조절","빠르고 느림을 알맞게",3],
+["기억력","기억하는 힘",3],
+["창의력","새롭게 생각하는 힘",3],
+["사고력","깊이 생각하는 힘",3],
+["문해력","글을 읽고 이해하는 힘",3],
+["어휘력","낱말을 많이 아는 힘",3],
+["탐구심","알아내려고 파고드는 마음",3],
+["개념정리","뜻을 모아 정리하기",3],
+["오답분석","틀린 이유를 살펴보기",3],
+["시험불안","시험 때 느끼는 걱정",3],
+["긴장완화","긴장을 풀기",3],
+["자기격려","나에게 힘 주는 말",3],
+["마인드맵","생각을 가지로 그리는 노트법",3],
+["포모도로","25분 집중 5분 휴식 방법",3],
+["시각화","머릿속에 그려 보기",3],
+["자기대화","나에게 하는 말",3],
+["몰입경험","푹 빠져 본 경험",3],
+["선택과집중","중요한 것에 힘 쏟기",3],
+["작심삼일","결심이 사흘 못 가는 것",3],
+["칠전팔기","일곱 번 넘어져도 여덟 번 일어나기",3],
+["호기심","궁금해하는 마음",3]
+];
+const FUN=[
+["치킨","바삭한 닭 요리",1],
+["축구","발로 공을 차는 운동",1],
+["젤리","쫀득쫀득 달콤한 간식",1],
+["댄스","몸으로 추는 춤",1],
+["셀카","내가 나를 찍는 사진",1],
+["웹툰","스마트폰으로 보는 만화",1],
+["틱톡","짧은 영상 앱",1],
+["슬라임","말랑말랑 늘어나는 장난감",1],
+["먹방","먹는 모습을 보여 주는 방송",1],
+["유튜브","영상을 보고 올리는 사이트",2],
+["떡볶이","빨갛고 쫄깃한 분식",2],
+["아이돌","노래하고 춤추는 가수",2],
+["다이소","뭐든 저렴한 가게",2],
+["스티커","붙였다 뗄 수 있는 그림",2],
+["캐릭터","만화 속 주인공",2],
+["숏폼","1분도 안 되는 짧은 영상",2],
+["탕후루","과일에 설탕을 입힌 간식",2],
+["마라탕","얼얼하고 매콤한 국물 요리",2],
+["포켓몬","피카츄가 나오는 캐릭터",2],
+["쿠키런","쿠키가 달리는 게임",2],
+["키링","가방에 다는 작은 장식",2],
+["챌린지","따라 하는 영상 놀이",2],
+["편의점","언제든 물건을 사는 가게",2],
+["케이팝","한국 대중가요",2],
+["로블록스","블록 세상 온라인 게임",3],
+["이모티콘","채팅에서 쓰는 그림",3],
+["인형뽑기","기계 집게로 인형 집기",3],
+["방탈출","문제를 풀며 방을 나가는 놀이",3],
+["보드게임","판 위에서 하는 놀이",3],
+["크리에이터","영상을 만들어 올리는 사람",3],
+["브롤스타즈","팀으로 싸우는 모바일 게임",3],
+["마인크래프트","블록으로 세상을 만드는 게임",3],
+["아이스크림","차갑고 달콤한 간식",2],
+["놀이공원","롤러코스터가 있는 곳",3],
+["키즈카페","어린이가 노는 카페",3],
+["인공지능","사람처럼 생각하는 컴퓨터",3],
+["메타버스","가상 세계",3],
+["라이브방송","실시간으로 보내는 방송",3],
+["스트리머","게임·방송을 생중계하는 사람",3],
+["콘텐츠","영상·글 같은 볼거리",3],
+["알고리즘","영상을 골라 보여 주는 규칙",3],
+["해시태그","# 붙이는 검색 표시",3],
+["인플루언서","영향력 있는 SNS 스타",3],
+["롤러스케이트","바퀴 달린 신발",3],
+["인생네컷","네 컷 사진 부스",3],
+["보드게임카페","보드게임하는 카페",3],
+["에어프라이어","기름 없이 튀기는 조리 기구",3],
+["포토카드","아이돌 사진 카드",3],
+["팔로워","나를 따라 보는 사람",3],
+["쇼츠영상","짧게 세로로 보는 영상",3],
+["아이패드","터치로 쓰는 태블릿",3]
+];
+let BANK=STUDY;
+function setBank(){const c=$('#cat').value;BANK=c==='study'?STUDY:c==='fun'?FUN:[...STUDY,...FUN]}
+const CH=['ㄱ','ㄲ','ㄴ','ㄷ','ㄸ','ㄹ','ㅁ','ㅂ','ㅃ','ㅅ','ㅆ','ㅇ','ㅈ','ㅉ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
+const cho=w=>[...w].map(c=>CH[Math.floor((c.charCodeAt(0)-0xAC00)/588)]).join('');
+const shuf=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+const $=s=>document.querySelector(s);
+const DESC={cho:'초성만 보고 단어를 맞혀요. 10문제, 한 문제에 30초! 시간이 지나면 정답을 알려 주고 다음 문제로 넘어가요.',scr:'필요한 글자만 골라 순서대로 눌러 단어를 만들어요. 7문제! 쓸모없는 글자도 섞여 있어요.',find:'글자판 사방에 흩어진 낱자를 순서대로 눌러 숨은 단어 5개를 만들어요. 제한 시간 안에!'};
+const NAME={cho:'초성 퀴즈',scr:'흩어진 글자',find:'단어 찾기'};
+let mode='cho',t0=0,tick=null,wrong=0,qi=0,Q=[],dTimer=null,lastRec=null,logs=[];
+try{logs=JSON.parse(localStorage.getItem('focusGameLog')||'[]')}catch(e){}
+
+document.querySelectorAll('.mode').forEach(b=>b.onclick=()=>{mode=b.dataset.m;document.querySelectorAll('.mode').forEach(x=>x.classList.toggle('on',x===b));$('#modeDesc').textContent=DESC[mode]});
+$('#modeDesc').textContent=DESC.cho;
+const CD={study:'집중·공부와 관련된 단어예요.',fun:'요즘 친구들이 좋아하는 것들! 공부와는 상관없어요. 재미있는 단어일수록 눈이 더 가요.',mix:'공부 단어와 관심 단어가 섞여요. 단어 찾기에서는 공부 단어 5개만 찾고, 관심 단어는 함정이에요!'};
+$('#cat').onchange=()=>$('#catDesc').textContent=CD[$('#cat').value];$('#catDesc').textContent=CD.study;
+const LD={hard:'어려운 단어 위주예요. 초성 힌트는 10초 뒤에 열리고, 흩어진 글자는 필요 없는 글자가 6~7개, 단어 찾기는 9×9 판에 긴 단어와 함정 단어가 나와요. 단어 찾기 제한시간 120초.',normal:'쉬운·보통·어려운 단어가 골고루 나와요. 단어 찾기 제한시간 150초.'};
+$('#lv').onchange=()=>$('#lvDesc').textContent=LD[$('#lv').value];$('#lvDesc').textContent=LD.hard;
+
+
+function show(id,on){$(id).classList.toggle('hide',!on)}
+function msg(t,ok){const m=$('#msg');m.textContent=t;m.style.color=ok?'#0E7C70':'#c0392b'}
+function startTimer(){t0=Date.now();clearInterval(tick);tick=setInterval(()=>$('#timer').textContent='⏱ '+Math.floor((Date.now()-t0)/1000)+'초',500)}
+
+/* distraction mode */
+function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),2200)}
+function startDist(){
+  const msgs=['📱 카톡! 친구가 메시지를 보냈어요','🎮 새 게임 이벤트가 열렸어요!','▶️ 구독한 채널에 새 영상이 올라왔어요','🔔 오늘의 특가! 지금 확인하세요','😂 이거 봤어? 완전 웃겨ㅋㅋ'];
+  const em=['📱','🎮','🍕','🐶','🎵','⚽'];
+  dTimer=setInterval(()=>{
+    if(Math.random()<.5)toast(msgs[Math.random()*msgs.length|0]);
+    else{const f=document.createElement('div');f.className='float';f.textContent=em[Math.random()*em.length|0];f.style.top=(10+Math.random()*70)+'vh';document.body.appendChild(f);setTimeout(()=>f.remove(),3300)}
+  },3500);
+}
+function stopDist(){clearInterval(dTimer);$('#toast').classList.remove('show')}
+
+let gid=0,qTimer=null,TOTAL=10,foundN=0,FIND_T=150,HARD=true;
+function stopAll(){gid++;clearInterval(tick);clearInterval(qTimer);stopDist()}
+$('#start').onclick=()=>{
+  stopAll();setBank();HARD=$('#lv').value==='hard';wrong=0;qi=0;TOTAL=mode==='cho'?10:7;show('#setup',false);show('#result',false);show('#play',true);msg('');
+  if(mode==='find')initFind();else{Q=pickMix(BANK,TOTAL);nextQ()}
+  startTimer();if($('#dist').checked)startDist();
+};
+$('#quit').onclick=()=>{stopAll();show('#play',false);show('#result',false);show('#setup',true);msg('');$('#timer').textContent='⏱ 0초'};
+
+function finish(){
+  clearInterval(tick);clearInterval(qTimer);stopDist();
+  const sec=Math.round((Date.now()-t0)/1000);
+  lastRec={game:NAME[mode]+({study:'',fun:'(관심)',mix:'(섞기)'})[$('#cat').value],dist:$('#dist').checked,sec,wrong,feel:null};
+  show('#play',false);show('#result',true);
+  $('#resTitle').textContent='🎉 끝!';
+  $('#resText').innerHTML=`${mode==='find'?`찾은 단어 <b>${foundN}/5개</b>. `:''}<b>${sec}초</b> 걸렸어요. 틀린 횟수 <b>${wrong}번</b>${mode==='cho'?' (시간 초과 포함)':''}.<br>${lastRec.dist?'방해 모드였어요. 알림이나 이모지 때문에 눈이 갔나요?':'방해 없이 한 판 했어요. 이 느낌을 기억해 둬요!'}`;
+  document.querySelectorAll('#feel button').forEach(b=>b.classList.remove('on'));
+  saveLog();
+}
+function saveLog(){logs.push(lastRec);try{localStorage.setItem('focusGameLog',JSON.stringify(logs.slice(-12)))}catch(e){}renderLog()}
+document.querySelectorAll('#feel button').forEach(b=>b.onclick=()=>{lastRec.feel=+b.dataset.f;document.querySelectorAll('#feel button').forEach(x=>x.style.background=x===b?'#FFC83D':'');try{localStorage.setItem('focusGameLog',JSON.stringify(logs.slice(-12)))}catch(e){}renderLog()});
+$('#again').onclick=()=>{show('#result',false);show('#setup',true)};
+function renderLog(){
+  $('#log').innerHTML=logs.slice(-6).map(r=>`<tr><td>${r.game}</td><td>${r.dist?'📱있음':'없음'}</td><td>${r.sec}초</td><td>${r.wrong}</td><td>${r.feel??'-'}</td></tr>`).join('')||'<tr><td colspan="5" class="note">아직 기록이 없어요</td></tr>';
+  const a=logs.filter(r=>!r.dist),b=logs.filter(r=>r.dist);
+  $('#cmp').textContent=(a.length&&b.length)?`방해 없음 평균 ${Math.round(a.reduce((s,r)=>s+r.sec,0)/a.length)}초 · 방해 있음 평균 ${Math.round(b.reduce((s,r)=>s+r.sec,0)/b.length)}초. 시간과 느낌은 어떻게 달랐나요? 짝에게 말해 봐요.`:'방해 없음과 방해 모드를 각각 한 번씩 해 보면 비교할 수 있어요.';
+}
+renderLog();
+
+/* 초성 & 흩어진 글자 */
+
+function pickMix(list,n){
+  const hard=$('#lv').value==='hard';
+  const plan=hard?(n>=10?{1:0,2:3,3:7}:{1:0,2:2,3:5}):(n>=10?{1:3,2:4,3:3}:{1:2,2:3,3:2});
+  const by={1:[],2:[],3:[]};shuf(list).forEach(x=>by[x[2]].push(x));
+  const out=[];for(const lv of [1,2,3])out.push(...by[lv].splice(0,plan[lv]));
+  const rest=shuf(hard?[...by[3],...by[2],...by[1]]:[...by[1],...by[2],...by[3]]);while(out.length<n&&rest.length)out.push(rest.shift());
+  return shuf(out).slice(0,n);
+}
+function pickFind(list){
+  const hard=$('#lv').value==='hard',Ls=hard?[3,4,5,6]:[2,3,4,5];
+  const src=hard?list.filter(x=>x[2]>=2):list;
+  const by={};shuf(src).forEach(x=>{const L=x[0].length;if(L>=Ls[0]&&L<=Ls[3])(by[L]=by[L]||[]).push(x)});
+  const clash=(a,b)=>a.startsWith(b)||b.startsWith(a);
+  const out=[];const fit=x=>!out.some(o=>clash(o[0],x[0]));
+  for(const L of Ls){const i=(by[L]||[]).findIndex(fit);if(i>=0)out.push(by[L].splice(i,1)[0])}
+  const rest=shuf(Ls.flatMap(L=>by[L]||[]));while(out.length<5&&rest.length){const x=rest.shift();if(fit(x))out.push(x)}
+  return out.slice(0,5).map(x=>x[0]);
+}
+function buildBoard(N,SRC,mix,fixed){
+  const hard=$('#lv').value==='hard';const nd=hard?(mix?5:3):(mix?3:0);
+  let g,words,decoys;
+  for(let t=0;t<150;t++){
+    g=Array.from({length:N},()=>Array(N).fill(''));decoys=[];words=fixed||pickFind(SRC);
+    const ok=words.every(w=>scatter(g,N,w));
+    if(ok&&nd){const pool=(mix?FUN:SRC).filter(b=>b[0].length>=2&&b[0].length<=4&&!words.includes(b[0]));
+      for(const [w] of shuf(pool)){if(decoys.length===nd)break;if([...words,...decoys].some(o=>o.startsWith(w)||w.startsWith(o)))continue;if(scatter(g,N,w))decoys.push(w)}}
+    if(ok&&decoys.length===nd)break;
+  }
+  const letters=[...words.join(''),...decoys.join('')];
+  for(let r=0;r<N;r++)for(let c=0;c<N;c++)if(!g[r][c])g[r][c]=(hard&&Math.random()<.65)?letters[Math.random()*letters.length|0]:ALLCH[Math.random()*ALLCH.length|0];
+  return {g,words,decoys};
+}
+function scatter(g,N,w){
+  // 같은 단어의 글자끼리: 서로 멀리(거리 3 이상 -> 안 되면 2), 같은 가로줄·세로줄 금지
+  const dist=(a,b)=>Math.max(Math.abs(a[0]-b[0]),Math.abs(a[1]-b[1]));
+  const near=(r,c)=>{for(let a=r-1;a<=r+1;a++)for(let b=c-1;b<=c+1;b++)if(a>=0&&b>=0&&a<N&&b<N&&g[a][b])return true;return false};
+  for(const D of [3,2]){
+    for(let t=0;t<500;t++){const cs=[];let ok=true;
+      for(let i=0;i<w.length;i++){let placed=false;
+        for(let k=0;k<120;k++){const r=Math.random()*N|0,c=Math.random()*N|0;
+          if(g[r][c])continue;
+          if(cs.some(x=>dist(x,[r,c])<D||x[0]===r||x[1]===c))continue;
+          cs.push([r,c]);placed=true;break}
+        if(!placed){ok=false;break}}
+      if(ok){cs.forEach(([r,c],i)=>g[r][c]=w[i]);return true}}
+  }
+  return false;
+}
+
+const ALLCH=[...new Set([...STUDY,...FUN].map(b=>b[0]).join(''))];
+function nextQ(){
+  const my=gid;const go=(f,ms)=>setTimeout(()=>{if(my===gid)f()},ms);
+  clearInterval(qTimer);
+  if(qi>=TOTAL)return finish();
+  const [w,h]=Q[qi];$('#qno').textContent=`${qi+1} / ${TOTAL}`;msg('');
+  if(mode==='cho'){
+    $('#stage').innerHTML=`<div class="cd"><i id="cdb"></i></div><div class="cdt" id="cdt">남은 시간 30초</div><div class="big">${cho(w)}</div><div class="hint" id="hnt">${HARD?'🔒 힌트는 10초 뒤에 열려요 ('+w.length+'글자)':'💡 '+h+' ('+w.length+'글자)'}</div><input type="text" id="ans" autocomplete="off" placeholder="정답 쓰기"><button class="primary" id="ok" style="margin-top:10px">확인</button>`;
+    let done=false;const t1=Date.now();
+    qTimer=setInterval(()=>{
+      const left=Math.max(0,30-(Date.now()-t1)/1000);
+      $('#cdb').style.width=(left/30*100)+'%';$('#cdt').textContent='남은 시간 '+Math.ceil(left)+'초';if(HARD&&30-left>=10){const hh=$('#hnt');if(hh&&!hh.dataset.o){hh.dataset.o=1;hh.textContent='💡 '+h+' ('+w.length+'글자)'}}
+      if(left<=0&&!done){done=true;clearInterval(qTimer);wrong++;$('#ans').disabled=true;$('#ok').disabled=true;msg(`⏰ 시간 끝! 정답은 '${w}'`,false);qi++;go(nextQ,1800)}
+    },200);
+    const chk=()=>{if(done)return;const v=$('#ans').value.trim();if(!v)return;if(v===w){done=true;clearInterval(qTimer);msg('정답! 👍',true);qi++;go(nextQ,700)}else{wrong++;msg('아쉬워요, 다시 생각해 봐요',false);$('#ans').select()}};
+    $('#ok').onclick=chk;$('#ans').onkeydown=e=>{if(e.key==='Enter')chk()};$('#ans').focus();
+  }else{
+    const extra=shuf(ALLCH.filter(c=>!w.includes(c))).slice(0,(HARD?6:4)+(Math.random()<.5?1:0));
+    let order=shuf([...w,...extra]);
+    let got=[];
+    const draw=()=>{
+      $('#stage').innerHTML=`<div class="hint">💡 ${h} (${w.length}글자 단어)</div><p class="note" style="text-align:center">글자 ${order.length}개 중 ${w.length}개만 써요. 나머지 ${extra.length}개는 필요 없는 글자예요!</p><div class="tiles">${[...w].map((_,i)=>`<div class="slot">${got[i]?got[i].c:''}</div>`).join('')}</div><div class="tiles">${order.map((c,i)=>`<button class="tile ${got.some(g=>g.i===i)?'used':''}" data-i="${i}">${c}</button>`).join('')}</div><button class="sec" id="undo" style="width:100%">↩ 하나 지우기</button>`;
+      document.querySelectorAll('.tile').forEach(t=>t.onclick=()=>{const i=+t.dataset.i;if(got.some(g=>g.i===i))return;got.push({i,c:order[i]});if(got.length===w.length){if(got.map(g=>g.c).join('')===w){draw();msg('정답! 👍',true);qi++;go(nextQ,700);return}wrong++;msg('다시 골라 봐요. 필요 없는 글자가 섞여 있어요!',false);got=[]}draw()});
+      $('#undo').onclick=()=>{got.pop();draw()};
+    };draw();
+  }
+}
+
+/* 단어 찾기 (낱자 흩어 놓기) */
+function initFind(){
+  const my=gid;FIND_T=HARD?120:150;const N=HARD?9:8;const mix=$('#cat').value==='mix';
+  const SRC=mix?STUDY:BANK;let decoys=[],words=[],g;
+  {const B=buildBoard(N,SRC,mix);g=B.g;words=B.words;decoys=B.decoys}
+  const found=new Set();let sel=[];const used=new Set();foundN=0;
+  $('#qno').textContent='숨은 단어 5개';
+  const t1=Date.now();clearInterval(qTimer);
+  qTimer=setInterval(()=>{if(my!==gid)return;const left=Math.max(0,FIND_T-(Date.now()-t1)/1000);
+    const b=$('#cdb'),t=$('#cdt');if(b)b.style.width=(left/FIND_T*100)+'%';if(t){t.textContent='남은 시간 '+Math.ceil(left)+'초';t.style.color=left<=20?'#c0392b':'#0E7C70'}
+    if(left<=0){clearInterval(qTimer);msg('⏰ 시간 끝!',false);setTimeout(()=>{if(my===gid)finish()},800)}},200);
+  const key=(r,c)=>r+','+c;
+  const word=()=>sel.map(([r,c])=>g[r][c]).join('');
+  const draw=()=>{
+    $('#stage').innerHTML=`<div class="cd"><i id="cdb"></i></div><div class="cdt" id="cdt">남은 시간 ${FIND_T}초</div><div class="words">${words.map(w=>`<span class="${found.has(w)?'ok':''}">${w}</span>`).join('')}</div><div class="hint" style="font-size:22px;min-height:34px">${word()||'글자를 순서대로 눌러요'}</div><div class="grid" style="grid-template-columns:repeat(${N},1fr)">${g.map((row,r)=>row.map((ch,c)=>`<button class="cell ${sel.some(x=>x[0]===r&&x[1]===c)?'pick':''} ${used.has(key(r,c))?'found':''}" data-r="${r}" data-c="${c}">${ch}</button>`).join('')).join('')}</div><div class="row" style="justify-content:center"><button class="sec" id="clr">↩ 지우기</button><button class="primary" id="chk" style="width:auto;padding:12px 28px">✔ 확인</button></div><p class="note" style="text-align:center">단어의 글자들이 <b>흩어져</b> 있어요. 글자를 <b>순서대로 하나씩</b> 눌러 단어를 만들어요.${decoys.length?'<br>목록에 없는 단어는 함정이에요!':''}</p>`;
+    document.querySelectorAll('.cell').forEach(b=>b.onclick=()=>tap(+b.dataset.r,+b.dataset.c));
+    $('#clr').onclick=()=>{sel.pop();draw()};$('#chk').onclick=check;
+  };
+  const accept=s=>{const cells=sel.slice();found.add(s);foundN=found.size;cells.forEach(([r,c])=>used.add(key(r,c)));sel=[];msg(`'${s}' 찾았다! 👍`,true);if(found.size===5){draw();setTimeout(()=>{if(my===gid)finish()},700)}else draw()};
+  const check=()=>{if(my!==gid||!sel.length)return;const s=word();
+    if(words.includes(s)&&!found.has(s))return accept(s);
+    wrong++;sel=[];msg(decoys.includes(s)?`'${s}'는 함정 단어예요! 😅`:'그런 단어는 없어요. 다시!',false);draw()};
+  const tap=(r,c)=>{
+    if(my!==gid||used.has(key(r,c)))return;
+    const i=sel.findIndex(x=>x[0]===r&&x[1]===c);
+    if(i>=0)sel.splice(i,1);else sel.push([r,c]);
+    const s=word();
+    if(words.includes(s)&&!found.has(s))return accept(s);
+    if(decoys.includes(s)){wrong++;sel=[];msg(`'${s}'는 함정 단어예요! 😅`,false)}else msg('');
+    draw();
+  };
+  draw();
+}
+</script></body></html>
